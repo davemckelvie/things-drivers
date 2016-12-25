@@ -15,27 +15,30 @@ HD44870 type displays (using those cheap i2c converter modules)
 1. Clone repo ```git clone https://bitbucket.org/subverse/things-drivers.git```
 2. create a new project in Android studio for Android Things
 3. import the driver as a module
-4. create the lcd object passing module width and height to ```create()```
-5. call ```lcd.connect()``` to open and initialise the display
-6. some time later write something to the display (I'll fix this later)
+4. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height
+5. use the builder to setup the pin mapping between PCF8574 pins and LCD pins
+6. call ```lcd.connect()``` to open and initialise the display
+7. some time later write something to the display
 ```java
 @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    lcd = I2cSerialCharLcd.create(16, 4);
+    I2cSerialCharLcd.builder builder = I2cSerialCharLcd.builder(16, 4);
+    builder.rs(0).rw(1).e(2).bl(3).data(4, 5, 6, 7).address(7);
+    I2cSerialCharLcd lcd = I2cSerialCharLcd.create(16, 4);
     lcd.connect();
     handler.postDelayed(connectRunnable, 1000);
   }
 ```
-7. write to the display with lcd.print(). The first argument is the 'position' to start writing from
+8. write to the display with lcd.print(). The first argument is the LCD line to write to 
 ```java
 private final class ConnectRunnable implements Runnable {
 
     int count = 0;
     @Override
     public void run() {
-      lcd.print(I2cSerialCharLcd.LCD_LINE_ONE, "Android Tings <3");
-      lcd.print(I2cSerialCharLcd.LCD_LINE_TWO, String.valueOf(count++));
+      lcd.print(1, "Android Tings <3");
+      lcd.print(2, String.valueOf(count++));
 
       handler.postDelayed(this, 2000);
     }
