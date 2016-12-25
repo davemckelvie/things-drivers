@@ -17,7 +17,6 @@ package nz.geek.android.things.drivers.lcd;
 
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.IntDef;
 import android.util.Log;
 
 import nz.geek.android.things.drivers.i2c.Pcf8574;
@@ -25,68 +24,19 @@ import nz.geek.android.things.drivers.i2c.Pcf8574;
 public class I2cSerialCharLcd implements Lcd {
 
   private static final String TAG = "TingTing";
-  private static final int ADDRESS = 0x07;      // PCF8574 A0-A2 for your board
 
   private static final int SPACE = 0x20;
-
-  /**
-   * Data and control line mapping and masks.
-   *
-   * Data does not affect port state when controlMask bit is 1
-   *
-   *   PCF8574 LCD         D_M   C_M1   C_M2
-   *   ----------------------------------------
-   *   P7      (14)D7      0      1      1
-   *   P6      (13)D6      0      1      1
-   *   P5      (12)D5      0      1      1
-   *   P4      (11)D4      0      1      1
-   *   P3      (-) BL      1      1      0
-   *   P2      (6) E       1      0      1
-   *   P1      (5) R/W     1      0      0
-   *   P0      (4) RS      1      0      0
-   *
-   *   DATA_MASK           0x0F
-   *   CONTROL_MASK_1      0xF8
-   *   CONTROL_MASK_2      0xF4 (for display with E2)
-   */
-  private static final int DATA_MASK = 0x0F;
-  private static final int CONTROL_MASK_1 = 0xF8;
-  private static final int CONTROL_MASK_2 = 0xF4;
-  private static final int BL_MASK = 0xF7;
 
   /**
    * PCF8574 to LCD pin mapping
    */
   private static final int LCD_BF = 0x80; // D7
-  private static final int LCD_BACKLIGHT = 0x08;
-  private static final int LCD_E  = 0x04;
-  private static final int LCD_RW = 0x02;
-  private static final int LCD_RS = 0x01;
-
-  private static final int LCD_BF_PIN = 7;
-  private static final int LCD_BACKLIGHT_PIN = 3;
-  private static final int LCD_E_PIN  = 2;
-  private static final int LCD_RW_PIN = 1;
-  private static final int LCD_RS_PIN = 0;
 
   /**
-   * command to select first or second half of 40x4 display
+   * addresses for start of lines
    */
-  private static final int  LCD_DISPLAY_ONE = CONTROL_MASK_1;
-  private static final int  LCD_DISPLAY_TWO = CONTROL_MASK_2;
-
-  /**
-   * command to set cursor to start of first line
-   */
-  @IntDef({LCD_LINE_ONE, LCD_LINE_TWO, LCD_LINE_THREE, LCD_LINE_FOUR})
-  public @interface LcdLine {}
-  public static final int  LCD_LINE_ONE = 0x80;
-  public static final int  LCD_LINE_TWO = 0xC0;
-  public static final int  LCD_LINE_THREE = 0x94;
-  public static final int  LCD_LINE_FOUR = 0xD4;
-
-  private static final int  LCD_CHAR_WIDTH      =     5;
-  private static final int  LCD_CHAR_HEIGHT     =     7;
+  public static final int  LCD_LINE_ONE = 0x00;
+  public static final int  LCD_LINE_TWO = 0x40;
 
   /**
    * Commands used with {@writeCommend}
@@ -129,41 +79,96 @@ public class I2cSerialCharLcd implements Lcd {
   private final HandlerThread handlerThread = new HandlerThread(TAG);
   private Handler handler;
   private InitRunnable initRunnable = new InitRunnable();
+
+  /**
+   * Read / Write pin bit value
+   */
+  private int rw = 0;
+
+  /**
+   * Register select pin bit value
+   */
   private int rs = 0;
 
   /**
    * 40x4 displays have two enable pins, they're effectively two displays
+   * this could be BV(ePin) or BV(e2Pin)
    */
-  private int en = LCD_E;
+  private int en = 0;
 
   /**
    * control mask will change when using 40x4 displays with two enable pins
    */
-  private int controlMask = CONTROL_MASK_1;
+  private final int controlMask;
+
+  /**
+   * data mask bit value
+   */
+  private final int dataMask;
 
   private boolean initialised = false;
   private boolean doubleWrite = false;
 
   private final int width;
   private final int height;
+  private final int address;
+  private final boolean isPcf8574;
+  private final boolean hasBackLight;
 
-  private I2cSerialCharLcd(int width, int height) {
+  /**
+   * pin numbers [0:7]
+   */
+  private final int ePin;
+  private final int e2Pin;
+  private final int rsPin;
+  private final int rwPin;
+  private final int blPin;
+
+  private I2cSerialCharLcd(int width, int height, int address,
+                           int ePin, int e2Pin, int rsPin, int rwPin,
+                           int d4Pin, int d5Pin, int d6Pin, int d7Pin,
+                           boolean isPcf8574, boolean hasBl, int blPin) {
     this.width = width;
     this.height = height;
+    this.address = address;
+    this.isPcf8574 = isPcf8574;
+    this.ePin = ePin;
+    this.e2Pin = e2Pin;
+    this.rsPin = rsPin;
+    this.rwPin = rwPin;
+    this.blPin = blPin;
+    this.hasBackLight = hasBl;
+
+    // setup the masks and bit positions from pin numbers
+    en = BV(ePin);
+    rs = BV(rsPin);
+    rw = BV(rwPin);
+
+    // initialise data and control masks, data does not affect port when mask bit is 1
+    dataMask = ~(BV(d4Pin) | BV(d5Pin) | BV(d6Pin) | BV(d7Pin));
+    controlMask = ~(en | rs | rw);
+
     createPort();
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
+
+    // TODO: if width x height is more than 80 it will have 2 Enables
+  }
+
+  /**
+   * return the bit value of pin number
+   * @param pin number [0:7]
+   * @return bit value
+   */
+  private static int BV(int pin) {
+    return (1 << pin);
   }
 
   /**
    * create the I2C IO port (PCF8574)
    */
   private void createPort() {
-    pcf8574 = Pcf8574.create(ADDRESS);
-  }
-
-  public static I2cSerialCharLcd create(int width, int height) {
-    return new I2cSerialCharLcd(width, height);
+    pcf8574 = Pcf8574.create(address, isPcf8574);
   }
 
   @Override
@@ -183,12 +188,16 @@ public class I2cSerialCharLcd implements Lcd {
     }
   }
 
+  /**
+   * print a message to the display
+   * @param line the line number to print to
+   * @param message the message to write
+   */
   @Override
-  public void print(int position, String message) {
-    writeCommand(position);
+  public void print(int line, String message) {
+    writeCommand(LCD_SET_DD_RAM | lineToAddress(line));
     for (int i = 0; i < message.length(); i++) {
-      char c = message.charAt(i);
-      write(c);
+      write(message.charAt(i));
     }
   }
 
@@ -199,12 +208,12 @@ public class I2cSerialCharLcd implements Lcd {
   private void write(int data) {
     pcf8574.writeByte(controlMask, rs);         // RS = rs, E = 0, R/W = 0
     pcf8574.writeByte(controlMask, rs | en);    // RS = rs, E = 1, R/W = 0
-    pcf8574.writeByte(DATA_MASK, data);         // D0-7 = data
+    pcf8574.writeByte(dataMask, data);          // D0-7 = data
     pcf8574.writeByte(controlMask, rs);         // RS = rs, E = 0, R/W = 0
 
     if (doubleWrite) {
       pcf8574.writeByte(controlMask, rs | en);  // RS = rs, E = 1, R/W = 0
-      pcf8574.writeByte(DATA_MASK, data << 4);
+      pcf8574.writeByte(dataMask, data << 4);
       pcf8574.writeByte(controlMask, rs);       // RS = rs, E = 0, R/W = 0
     }
   }
@@ -212,21 +221,41 @@ public class I2cSerialCharLcd implements Lcd {
   private void writeCommand(int command) {
     rs = 0;
     write(command);
-    rs = LCD_RS;
+    rs = BV(rsPin);
+  }
+
+  /**
+   * convert display line number to DDRAM address
+   * @param line line number [1:height]
+   * @return DDRAM address for the start of line
+   */
+  private int lineToAddress(int line) {
+    switch(line) {
+      case 1:
+        return LCD_LINE_ONE;
+      case 2:
+        return LCD_LINE_TWO;
+      case 3:
+        return LCD_LINE_ONE + width;
+      case 4:
+        return LCD_LINE_TWO + width;
+      default:
+        return LCD_LINE_ONE;
+    }
   }
 
   private int readAddressCounterAndBusyFlag() {
     // set D7 - D4 bits high before use as inputs in accordance with PCF8574 data sheet.
-    pcf8574.writeByte(DATA_MASK, 0xFF);               // D0-7 = 0xFF
-    pcf8574.writeByte(controlMask, LCD_RW);           // RS = 0, E = 0, R/W = 1
-    pcf8574.writeByte(controlMask, LCD_RW | en);      // RS = 0, E = 1, R/W = 1
+    pcf8574.writeByte(dataMask, 0xFF);               // D0-7 = 0xFF
+    pcf8574.writeByte(controlMask, rw);           // RS = 0, E = 0, R/W = 1
+    pcf8574.writeByte(controlMask, rw | en);      // RS = 0, E = 1, R/W = 1
     int reg = pcf8574.readByte();                     // D7 = busy flag
-    pcf8574.writeByte(controlMask, LCD_RW);           // RS = 0, E = 0, R/W = 1
+    pcf8574.writeByte(controlMask, rw);           // RS = 0, E = 0, R/W = 1
 
     if (doubleWrite) {
-      pcf8574.writeByte(controlMask, LCD_RW | en);    // RS = 0, E = 1, R/W = 1
+      pcf8574.writeByte(controlMask, rw | en);    // RS = 0, E = 1, R/W = 1
       int dummy = pcf8574.readByte();
-      pcf8574.writeByte(controlMask, LCD_RW);         // RS = 0, E = 0, R/W = 1
+      pcf8574.writeByte(controlMask, rw);         // RS = 0, E = 0, R/W = 1
     }
     pcf8574.writeByte(0, 0);                          // D0-7 = 0, RS = 0, E = 0, R/W = 0
 
@@ -276,7 +305,9 @@ public class I2cSerialCharLcd implements Lcd {
 
   @Override
   public void enableBackLight(boolean enable) {
-    pcf8574.setPin(LCD_BACKLIGHT_PIN, enable);
+    if (hasBackLight) {
+      pcf8574.setPin(blPin, enable);
+    }
   }
 
   /**
@@ -306,10 +337,101 @@ public class I2cSerialCharLcd implements Lcd {
   }
 
   @Override
-  public void clearLine(@LcdLine int line) {
-    writeCommand(line);
+  public void clearLine(int line) {
+    writeCommand(lineToAddress(line));
     for (int i = 0; i < width; i++) {
       writeCommand(SPACE);
     }
+  }
+
+  @Override
+  public void clearDisplay() {
+    writeCommand(LCD_CLEAR_DISPLAY);
+  }
+
+  @Override
+  public int getWidth() {
+    return width;
+  }
+
+  @Override
+  public int getHeight() {
+    return height;
+  }
+
+  public static I2cSerialCharLcdBuilder builder(int width, int height) {
+    return new I2cSerialCharLcdBuilder(width, height);
+  }
+
+  public static final class I2cSerialCharLcdBuilder {
+    private int width;
+    private int height;
+
+    // port pin numbers [0:7]
+    private int e1Pin;
+    private int e2Pin;
+    private int rsPin;
+    private int rwPin;
+    private int blPin;
+    private int d4Pin, d5Pin, d6Pin, d7Pin;
+
+    private int address;
+    private boolean isPcf8574 = false; // i.e., not pcf8574A, default to no
+    private boolean hasBackLight = false;
+
+    /*package*/ I2cSerialCharLcdBuilder(int width, int height) {
+      this.width = width;
+      this.height = height;
+    }
+
+    public I2cSerialCharLcdBuilder isPcf8574(boolean isPcf8574) {
+      this.isPcf8574 = isPcf8574;
+      return this;
+
+    }
+    public I2cSerialCharLcdBuilder e(int e1Pin) {
+      this.e1Pin = e1Pin;
+      return this;
+    }
+
+    public I2cSerialCharLcdBuilder e2(int e2Pin) {
+      this.e2Pin = e2Pin;
+      return this;
+    }
+
+    public I2cSerialCharLcdBuilder rs(int rsPin) {
+      this.rsPin = rsPin;
+      return this;
+    }
+
+    public I2cSerialCharLcdBuilder rw(int rwPin) {
+      this.rwPin = rwPin;
+      return this;
+    }
+
+    public I2cSerialCharLcdBuilder bl(int blPin) {
+      this.blPin = blPin;
+      hasBackLight = true;
+      return this;
+    }
+
+    public I2cSerialCharLcdBuilder data(int d4Pin, int d5Pin, int d6Pin, int d7Pin) {
+      this.d4Pin = d4Pin;
+      this.d5Pin = d5Pin;
+      this.d6Pin = d6Pin;
+      this.d7Pin = d7Pin;
+      return this;
+    }
+
+    public I2cSerialCharLcdBuilder address(int address) {
+      this.address = address;
+      return this;
+    }
+
+    public I2cSerialCharLcd build() {
+      return new I2cSerialCharLcd(width, height, address, e1Pin, e2Pin, rsPin, rwPin,
+              d4Pin, d5Pin, d6Pin, d7Pin, isPcf8574, hasBackLight, blPin);
+    }
+
   }
 }
