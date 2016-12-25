@@ -18,8 +18,11 @@ package nz.geek.android.things.drivers.lcd;
 public interface Lcd {
   void connect();
   void disconnect();
-  void print(int position, String message);
+  void print(int line, String message);
   void enableBackLight(boolean enable);
   void setCgRam(int address, byte[] pattern);
   void clearLine(int line);
+  void clearDisplay();
+  int getWidth();
+  int getHeight();
 }
