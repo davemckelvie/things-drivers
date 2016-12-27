@@ -16,13 +16,68 @@
 package nz.geek.android.things.drivers.lcd;
 
 public interface Lcd {
+  /**
+   * Connect to the LCD display. This initialises the display.
+   */
   void connect();
+
+  /**
+   * Disconnect from the display
+   */
   void disconnect();
+
+  /**
+   * Print a message to the display starting at the given display line
+   * @param line  the line to print the message [1:height]
+   * @param message the message to print
+   */
   void print(int line, String message);
+
+  /**
+   * Switch on and off the LCD backlight
+   * @param enable true to enable
+   */
   void enableBackLight(boolean enable);
+
+  /**
+   * write a bit pattern to CGRAM to generate a custom character
+   *
+   * <pre>
+   * bit pattern     eg          hex
+   * 76543210
+   * ---XXXXX        XXXX        1E
+   * ---XXXXX        X   X       11
+   * ---XXXXX        X   X       11
+   * ---XXXXX        XXXX        1E
+   * ---XXXXX        X   X       11
+   * ---XXXXX        X   X       11
+   * ---XXXXX        XXXX        1E
+   * </pre>
+   * @param address the CGRAM address to write the bit pattern to.
+   * @param pattern the bit pattern to write
+   */
   void setCgRam(int address, byte[] pattern);
+
+  /**
+   * Clear a given line of the LCD display
+   * @param line line to clear [1:height]
+   */
   void clearLine(int line);
+
+  /**
+   * clear the display. Fills DDRAM with space character (0x20)
+   */
   void clearDisplay();
+
+  /**
+   * Get the number of LCD character rows
+   * @return LCD rows
+   */
   int getWidth();
+
+  /**
+   * Get the number of LCD character columns
+   * @return LCD columns
+   */
   int getHeight();
 }

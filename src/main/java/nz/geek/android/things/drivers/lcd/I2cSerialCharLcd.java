@@ -15,15 +15,9 @@
  */
 package nz.geek.android.things.drivers.lcd;
 
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.util.Log;
-
 import nz.geek.android.things.drivers.i2c.Pcf8574;
 
 public class I2cSerialCharLcd implements Lcd {
-
-  private static final String TAG = "TingTing";
 
   private static final int SPACE = 0x20;
 
@@ -33,7 +27,7 @@ public class I2cSerialCharLcd implements Lcd {
   private static final int LCD_BF = 0x80; // D7
 
   /**
-   * addresses for start of lines
+   * DDRAM addresses for start of lines 1 and 2
    */
   public static final int  LCD_LINE_ONE = 0x00;
   public static final int  LCD_LINE_TWO = 0x40;
@@ -76,10 +70,6 @@ public class I2cSerialCharLcd implements Lcd {
 
   private Pcf8574 pcf8574;
 
-  private final HandlerThread handlerThread = new HandlerThread(TAG);
-  private Handler handler;
-  private InitRunnable initRunnable = new InitRunnable();
-
   /**
    * Read / Write pin bit value
    */
@@ -106,7 +96,6 @@ public class I2cSerialCharLcd implements Lcd {
    */
   private final int dataMask;
 
-  private boolean initialised = false;
   private boolean doubleWrite = false;
 
   private final int width;
@@ -149,10 +138,6 @@ public class I2cSerialCharLcd implements Lcd {
     controlMask = ~(en | rs | rw);
 
     createPort();
-    handlerThread.start();
-    handler = new Handler(handlerThread.getLooper());
-
-    // TODO: if width x height is more than 80 it will have 2 Enables
   }
 
   /**
@@ -174,14 +159,11 @@ public class I2cSerialCharLcd implements Lcd {
   @Override
   public void connect() {
     if (pcf8574 == null) createPort();
-
-    handler.post(initRunnable);
+    init();
   }
 
   @Override
   public void disconnect() {
-    handler.removeCallbacks(initRunnable);
-    handlerThread.quitSafely();
     if (pcf8574 != null) {
       pcf8574.close();
       pcf8574 = null;
@@ -195,10 +177,22 @@ public class I2cSerialCharLcd implements Lcd {
    */
   @Override
   public void print(int line, String message) {
+
+    // support displays with more than 80 characters (will have 2 enable pins)
+    if ((width * height > 80) && line > 2) {
+        // lines 3 and 4 only
+        line -= 2;
+        switchDisplay(2);
+    }
+
     writeCommand(LCD_SET_DD_RAM | lineToAddress(line));
     for (int i = 0; i < message.length(); i++) {
       write(message.charAt(i));
     }
+
+    // always default to first display, won't have an effect on displays with less than
+    // 80 characters
+    switchDisplay(1);
   }
 
   /**
@@ -259,7 +253,6 @@ public class I2cSerialCharLcd implements Lcd {
     }
     pcf8574.writeByte(0, 0);                          // D0-7 = 0, RS = 0, E = 0, R/W = 0
 
-    Log.d(TAG, String.format("BF = %02X", reg & 0xFF));
     return reg;
   }
 
@@ -271,36 +264,48 @@ public class I2cSerialCharLcd implements Lcd {
     return (readAddressCounterAndBusyFlag() & 0x7F);
   }
 
-  private final class InitRunnable implements Runnable {
-
-    @Override
-    public void run() {
-      if (pcf8574 == null) return;
-
-      if (initialised) return;
-
-      doubleWrite = false;
-      pcf8574.writeByte(0x00, 0x00);
-
-      writeCommand(LCD_8_BIT);
-      try {
-        Thread.sleep(2);
-      } catch (InterruptedException e) {
-        // meh
-      }
-      writeCommand(LCD_8_BIT);
-      writeCommand(LCD_8_BIT);
-
-      writeCommand(LCD_4_BIT);
-      doubleWrite = true;
-      writeCommand(LCD_4_BIT | LCD_2_LINE);
-
-      writeCommand(LCD_DISPLAY_OFF);
-      writeCommand(LCD_CLEAR_DISPLAY);
-      writeCommand(LCD_INCREMENT_DD_RAM);
-      writeCommand(LCD_DISPLAY_ON | LCD_CURSOR_OFF | LCD_BLINK_OFF);
-      initialised = true;
+  private void switchDisplay(int display) {
+    if (display == 2) {
+      en = BV(e2Pin);
+    } else {
+      en = BV(ePin);
     }
+  }
+
+  private void init() {
+    if (pcf8574 == null) return;
+
+    switchDisplay(1);
+    pcf8574.writeByte(0x00, 0x00);
+    initialiseLcd();
+    if (width * height > 80) {
+      switchDisplay(2);
+      initialiseLcd();
+      switchDisplay(1);
+    }
+  }
+
+  private void initialiseLcd() {
+
+    doubleWrite = false;
+
+    writeCommand(LCD_8_BIT);
+    try {
+      Thread.sleep(2);
+    } catch (InterruptedException e) {
+      // meh
+    }
+    writeCommand(LCD_8_BIT);
+    writeCommand(LCD_8_BIT);
+
+    writeCommand(LCD_4_BIT);
+    doubleWrite = true;
+    writeCommand(LCD_4_BIT | LCD_2_LINE);
+
+    writeCommand(LCD_DISPLAY_OFF);
+    writeCommand(LCD_CLEAR_DISPLAY);
+    writeCommand(LCD_INCREMENT_DD_RAM);
+    writeCommand(LCD_DISPLAY_ON | LCD_CURSOR_OFF | LCD_BLINK_OFF);
   }
 
   @Override
@@ -310,22 +315,6 @@ public class I2cSerialCharLcd implements Lcd {
     }
   }
 
-  /**
-   * write a bit pattern to CGRAM
-   *
-   * bit pattern     eg          hex
-   * 76543210
-   * ---XXXXX        XXXX        1E
-   * ---XXXXX        X   X       11
-   * ---XXXXX        X   X       11
-   * ---XXXXX        XXXX        1E
-   * ---XXXXX        X   X       11
-   * ---XXXXX        X   X       11
-   * ---XXXXX        XXXX        1E
-   *
-   * @param address
-   * @param pattern
-   */
   @Override
   public void setCgRam(int address, byte[] pattern) {
     int ac = readAddressCounter();
@@ -363,6 +352,9 @@ public class I2cSerialCharLcd implements Lcd {
     return new I2cSerialCharLcdBuilder(width, height);
   }
 
+  /**
+   * Builder used to create a {@link #I2cSerialCharLcd(int, int, int, int, int, int, int, int, int, int, int, boolean, boolean, int)}
+   */
   public static final class I2cSerialCharLcdBuilder {
     private int width;
     private int height;
@@ -384,37 +376,83 @@ public class I2cSerialCharLcd implements Lcd {
       this.height = height;
     }
 
+    /**
+     * Specify that the LCD is connected with a PCF8574. This uses a different
+     * base address to the more typical PCF8574A.
+     * @param isPcf8574 true when PCF8574 should be used
+     * @return
+     */
     public I2cSerialCharLcdBuilder isPcf8574(boolean isPcf8574) {
       this.isPcf8574 = isPcf8574;
       return this;
 
     }
+
+    /**
+     * Specify which pin of the PCF8574 is the LCD Enable pin
+     * @param e1Pin enable pin [0:7]
+     * @return
+     */
     public I2cSerialCharLcdBuilder e(int e1Pin) {
       this.e1Pin = e1Pin;
       return this;
     }
 
+    /**
+     * Specify which pin of the PCF8574 is the second Enable pin. Large
+     * LCD displays, more than 80 characters have 2 enable pins, one for
+     * the first 'half' of the display, one for the second.
+     * @param e2Pin Second anable pin [0:7]
+     * @return
+     */
     public I2cSerialCharLcdBuilder e2(int e2Pin) {
       this.e2Pin = e2Pin;
       return this;
     }
 
+    /**
+     * Specify which pin of the PCF8574 is the LCD Register Select pin.
+     * @param rsPin rs pin [0:7]
+     * @return
+     */
     public I2cSerialCharLcdBuilder rs(int rsPin) {
       this.rsPin = rsPin;
       return this;
     }
 
+    /**
+     * Specify which pin of the PCF8574 is the Read/Write pin
+     * @param rwPin rw pin [0:7]
+     * @return
+     */
     public I2cSerialCharLcdBuilder rw(int rwPin) {
       this.rwPin = rwPin;
       return this;
     }
 
+    /**
+     * Specify which pin of the PCF8574 controls the LCD backlight. The LCM1602
+     * uses one of the PCF8574 pins to control the LCD backlight. Some modules use
+     * another means of driving the LCD backlight and use this pin for the second
+     * LCD enable pin on large LCDs. If your module uses the PCF8574 to control
+     * the backlight specify it here. If it is not specified {@link #enableBackLight(boolean)} has no effect.
+     * @param blPin backlight control pin [0:7]
+     * @return
+     */
     public I2cSerialCharLcdBuilder bl(int blPin) {
       this.blPin = blPin;
       hasBackLight = true;
       return this;
     }
 
+    /**
+     * specify which pins of the PCF8574 are connected to the LCD data lines D4-D7
+     * @param d4Pin LCD D4 pin
+     * @param d5Pin LCD D5 pin
+     * @param d6Pin LCD D6 pin
+     * @param d7Pin LCD D7 pin
+     * @return
+     */
     public I2cSerialCharLcdBuilder data(int d4Pin, int d5Pin, int d6Pin, int d7Pin) {
       this.d4Pin = d4Pin;
       this.d5Pin = d5Pin;
@@ -423,15 +461,24 @@ public class I2cSerialCharLcd implements Lcd {
       return this;
     }
 
+    /**
+     * Specify the I2C address of the PCF8574. This is the value of A0-A2 pins, not
+     * the base address of the PCF8574 which is inferred with {@link #isPcf8574(boolean)}
+     * @param address value of A0-A2 [1:7]
+     * @return
+     */
     public I2cSerialCharLcdBuilder address(int address) {
       this.address = address;
       return this;
     }
 
+    /**
+     * Build the LCD
+     * @return A new {@link #I2cSerialCharLcd(int, int, int, int, int, int, int, int, int, int, int, boolean, boolean, int)} with your pin mapping.
+     */
     public I2cSerialCharLcd build() {
       return new I2cSerialCharLcd(width, height, address, e1Pin, e2Pin, rsPin, rwPin,
               d4Pin, d5Pin, d6Pin, d7Pin, isPcf8574, hasBackLight, blPin);
     }
-
   }
 }
