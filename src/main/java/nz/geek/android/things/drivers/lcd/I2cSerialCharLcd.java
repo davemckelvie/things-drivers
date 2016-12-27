@@ -33,7 +33,7 @@ public class I2cSerialCharLcd implements Lcd {
   public static final int  LCD_LINE_TWO = 0x40;
 
   /**
-   * Commands used with {@writeCommend}
+   * Commands used with {@link #writeCommand(int)}
    */
   private static final int LCD_CLEAR_DISPLAY = 0x01;
   private static final int LCD_RETURN_HOME = 0x02;
@@ -58,14 +58,6 @@ public class I2cSerialCharLcd implements Lcd {
   private static final int LCD_5_10_DOTS = 0x24;
   private static final int LCD_5_7_DOTS = 0x20;
   private static final int LCD_SET_CG_RAM = 0x40;
-  private static final int LCD_CG_RAM_ZERO = 0x00;
-  private static final int LCD_CG_RAM_ONE = 0x08;
-  private static final int LCD_CG_RAM_TWO = 0x10;
-  private static final int LCD_CG_RAM_THREE = 0x18;
-  private static final int LCD_CG_RAM_FOUR = 0x20;
-  private static final int LCD_CG_RAM_FIVE = 0x28;
-  private static final int LCD_CG_RAM_SIX = 0x30;
-  private static final int LCD_CG_RAM_SEVEN = 0x38;
   private static final int LCD_SET_DD_RAM = 0x80;
 
   private Pcf8574 pcf8574;
@@ -319,8 +311,8 @@ public class I2cSerialCharLcd implements Lcd {
   public void setCgRam(int address, byte[] pattern) {
     int ac = readAddressCounter();
     writeCommand(LCD_SET_CG_RAM | address);   // set CGRAM address
-    for (int i = 0; i < 8; i++) {
-      writeCommand(pattern[i]);
+    for (int i = 0; i < pattern.length; i++) {
+      write(pattern[i]);
     }
     writeCommand(ac);                 // restore address counter
   }
