@@ -12,37 +12,27 @@ HD44870 type displays (using those cheap i2c converter modules)
 
 ## How to use
 
-1. Clone repo ```git clone https://bitbucket.org/subverse/things-drivers.git```
-2. create a new project in Android studio for Android Things
-3. import the driver as a module
-4. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height
-5. use the builder to setup the pin mapping between PCF8574 pins and LCD pins
-6. call ```lcd.connect()``` to open and initialise the display
-7. some time later write something to the display
+1. Create an Android Things project as described [here](https://developer.android.com/things/training/first-device/create-studio-project.html)
+2. Add the following to your project's `build.gradle`
+```
+dependencies {
+    compile 'nz.geek.android.things:things-drivers:0.1.1'
+}
+```
+3. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height
+4. use the builder to setup the pin mapping between PCF8574 pins and LCD pins
+5. call ```lcd.connect()``` to open and initialise the display
+6. write something to the display
 ```java
 @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    I2cSerialCharLcd.builder builder = I2cSerialCharLcd.builder(16, 4);
-    builder.rs(0).rw(1).e(2).bl(3).data(4, 5, 6, 7).address(7);
-    I2cSerialCharLcd lcd = I2cSerialCharLcd.create(16, 4);
-    lcd.connect();
-    handler.postDelayed(connectRunnable, 1000);
-  }
-```
-8. write to the display with lcd.print(). The first argument is the LCD line to write to 
-```java
-private final class ConnectRunnable implements Runnable {
-
-    int count = 0;
-    @Override
-    public void run() {
-      lcd.print(1, "Android Tings <3");
-      lcd.print(2, String.valueOf(count++));
-
-      handler.postDelayed(this, 2000);
-    }
-  }
+protected void onCreate(Bundle savedInstanceState) {
+  super.onCreate(savedInstanceState);
+  I2cSerialCharLcd.I2cSerialCharLcdBuilder builder = I2cSerialCharLcd.builder(20, 4);
+  builder.rs(0).rw(1).e(2).bl(3).data(4, 5, 6, 7).address(6);
+  I2cSerialCharLcd lcd = builder.build();
+  lcd.connect();
+  lcd.print(1, "Hello World!");
+}
 ```
 
 ## License

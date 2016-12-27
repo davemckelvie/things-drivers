@@ -1,5 +1,25 @@
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'things-drivers'
+
+    publishedGroupId = 'nz.geek.android.things'
+    libraryName = 'ThingsDrivers'
+    artifact = 'things-drivers'
+
+    libraryDescription = 'Drivers for Android Things'
+
+    siteUrl = 'https://github.com/davemckelvie/things-drivers'
+    gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
+
+    libraryVersion = '0.1.1'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
@@ -32,3 +52,6 @@ dependencies {
 
     provided 'com.google.android.things:androidthings:0.1-devpreview'
 }
+
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'
