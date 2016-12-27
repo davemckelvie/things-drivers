@@ -16,12 +16,12 @@ HD44870 type displays (using those cheap i2c converter modules)
 2. Add the following to your project's `build.gradle`
 ```
 dependencies {
-    compile 'nz.geek.android.things:things-drivers:0.1.1'
+    compile 'nz.geek.android.things:things-drivers:1.0.0'
 }
 ```
 3. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height
 4. use the builder to setup the pin mapping between PCF8574 pins and LCD pins
-5. call ```lcd.connect()``` to open and initialise the display
+5. call `lcd.connect()` to open and initialise the display
 6. write something to the display
 ```java
 @Override
