@@ -232,10 +232,10 @@ public class I2cSerialCharLcd implements Lcd {
 
   private int readAddressCounterAndBusyFlag() {
     // set D7 - D4 bits high before use as inputs in accordance with PCF8574 data sheet.
-    pcf8574.writeByte(dataMask, 0xFF);               // D0-7 = 0xFF
+    pcf8574.writeByte(dataMask, 0xFF);            // D0-7 = 0xFF
     pcf8574.writeByte(controlMask, rw);           // RS = 0, E = 0, R/W = 1
     pcf8574.writeByte(controlMask, rw | en);      // RS = 0, E = 1, R/W = 1
-    int reg = pcf8574.readByte();                     // D7 = busy flag
+    int reg = pcf8574.readByte();                 // D7 = busy flag
     pcf8574.writeByte(controlMask, rw);           // RS = 0, E = 0, R/W = 1
 
     if (doubleWrite) {
@@ -243,7 +243,8 @@ public class I2cSerialCharLcd implements Lcd {
       int dummy = pcf8574.readByte();
       pcf8574.writeByte(controlMask, rw);         // RS = 0, E = 0, R/W = 1
     }
-    pcf8574.writeByte(0, 0);                          // D0-7 = 0, RS = 0, E = 0, R/W = 0
+    pcf8574.writeByte(controlMask, 0);            // RS = 0, E = 0, R/W = 0
+    pcf8574.writeByte(dataMask, 0);               // D0-7 = 0
 
     return reg;
   }
