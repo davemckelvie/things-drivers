@@ -1,7 +1,11 @@
+## 1.0.1 (2016-12-28)
+
+ - Bugfix: backlight disabled when CGRAM written to
+ 
 ## 1.0.0 (2016-12-28)
 
  - Support custom character creation with CGRAM
- 
+
 ## 0.1.1 (2016-12-27)
 
  - Added support for large displays e.g., 40x4
