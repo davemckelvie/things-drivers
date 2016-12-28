@@ -6,6 +6,8 @@ Here you will find some Android Things um, things, drivers and such.
 
 PCF8574(A)
 
+![Raspberry Pi Hookup](rpi3_pcf8574.png)
+
 ## Display Things
 
 HD44870 type displays (via LCM1602)
