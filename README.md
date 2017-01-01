@@ -8,6 +8,10 @@ PCF8574(A)
 
 ![Raspberry Pi Hookup](rpi3_pcf8574.png)
 
+PCF8591
+
+![Raspberry Pi Hookup](rpi3_pcf8591.png)
+
 ## Display Things
 
 HD44870 type displays (via LCM1602)
