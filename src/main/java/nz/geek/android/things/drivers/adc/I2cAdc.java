@@ -16,7 +16,7 @@ public class I2cAdc implements Adc {
   /**
    * read ADC every 50 ms
    */
-  private static final int CONVERSION_PERIOD = 50;
+  private static final int DEFAULT_RATE = 50;
 
   private static final int NUM_CHANNELS = 4;
   private static final int CHANNEL_MAX = 3;
@@ -28,8 +28,10 @@ public class I2cAdc implements Adc {
   private final Handler handler;
   private final AdcReaderRunnable adcReaderRunnable = new AdcReaderRunnable();
   private final Pcf8591 pcf8591;
+  private final int conversionRate;
 
-  private I2cAdc(int address, int mode) {
+  private I2cAdc(int address, int mode, int conversionRate) {
+    this.conversionRate = conversionRate;
     handlerThread = new HandlerThread(Pcf8591.class.getSimpleName());
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
@@ -68,6 +70,7 @@ public class I2cAdc implements Adc {
 
     private int address;
     private int mode;
+    private int rate = DEFAULT_RATE;
 
     public I2cAdcBuilder address(int address) {
       this.address = address;
@@ -94,8 +97,13 @@ public class I2cAdc implements Adc {
       return this;
     }
 
+    public I2cAdcBuilder withConversionRate(int rate) {
+      this.rate = rate;
+      return this;
+    }
+
     public I2cAdc build() {
-      return new I2cAdc(address, mode);
+      return new I2cAdc(address, mode, rate);
     }
   }
 
@@ -112,7 +120,7 @@ public class I2cAdc implements Adc {
 //      if (++currentChannel > CHANNEL_MAX) {
 //        currentChannel = CHANNEL_MIN;
 //      }
-      handler.postDelayed(this, CONVERSION_PERIOD);
+      handler.postDelayed(this, conversionRate);
     }
   }
 }
