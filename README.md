@@ -24,7 +24,7 @@ HD44870 type displays (via LCM1602)
 2. Add the following to your project's `build.gradle`
 ```
 dependencies {
-    compile 'nz.geek.android.things:things-drivers:1.0.1'
+    compile 'nz.geek.android.things:things-drivers:1.1.0'
 }
 ```
 3. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height
