@@ -65,6 +65,15 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
   }
 
   /**
+   * return the bit value of pin number
+   * @param pin number [0:7]
+   * @return bit value
+   */
+  public static int BV(int pin) {
+    return (1 << pin);
+  }
+
+  /**
    * Write a byte to the IO port applying a mask to the data. This enables the
    * setting of port state while not affecting the state of other port pins.
    * @param mask 8 bit mask, data does not affect port state when mask bit is 1

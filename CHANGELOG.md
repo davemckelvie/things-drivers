@@ -1,7 +1,11 @@
+## 1.1.0 (2017-01-01)
+
+ - Added PCF8591 ADC
+ 
 ## 1.0.1 (2016-12-28)
 
  - Bugfix: backlight disabled when CGRAM written to
- 
+
 ## 1.0.0 (2016-12-28)
 
  - Support custom character creation with CGRAM
