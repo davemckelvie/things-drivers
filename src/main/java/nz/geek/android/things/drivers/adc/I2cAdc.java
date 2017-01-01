@@ -14,9 +14,9 @@ import static nz.geek.android.things.drivers.i2c.Pcf8591.MODE_TWO_SINGLE_ONE_DIF
 public class I2cAdc implements Adc {
 
   /**
-   * read ADC every 50 ms
+   * read ADC every 500 ms by default. Change this with {@link I2cAdcBuilder#withConversionRate(int)}
    */
-  private static final int DEFAULT_RATE = 50;
+  private static final int DEFAULT_RATE = 500;
 
   private static final int NUM_CHANNELS = 4;
   private static final int CHANNEL_MAX = 3;
@@ -108,18 +108,12 @@ public class I2cAdc implements Adc {
   }
 
   private class AdcReaderRunnable implements Runnable {
-    private int currentChannel = 0;
-
     @Override
     public void run() {
       int[] rawValues = pcf8591.readAllChannels();
       for (int i = 0; i < CHANNEL_MAX; i++) {
         values[i] = (values[i] + rawValues[i]) / 2;
       }
-//      values[currentChannel] = (values[currentChannel] + pcf8591.readChannel(currentChannel)) / 2;
-//      if (++currentChannel > CHANNEL_MAX) {
-//        currentChannel = CHANNEL_MIN;
-//      }
       handler.postDelayed(this, conversionRate);
     }
   }
