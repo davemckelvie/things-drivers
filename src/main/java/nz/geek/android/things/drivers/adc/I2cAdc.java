@@ -2,26 +2,27 @@ package nz.geek.android.things.drivers.adc;
 
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.util.Log;
 
 import nz.geek.android.things.drivers.i2c.Pcf8591;
 
 import static nz.geek.android.things.drivers.i2c.Pcf8591.ANALOG_OUTPUT_ENABLE;
-import static nz.geek.android.things.drivers.i2c.Pcf8591.AUTO_INCREMENT;
 
 public class I2cAdc implements Adc {
-  private static final String TAG = "TingTing";
 
-  private static final int CONVERSION_PERIOD = 100;
+  /**
+   * read ADC every 50 ms
+   */
+  private static final int CONVERSION_PERIOD = 50;
+
   private static final int NUM_CHANNELS = 4;
   private static final int CHANNEL_MAX = 3;
   private static final int CHANNEL_MIN = 0;
 
   private int[] values = new int[NUM_CHANNELS];
 
-  private HandlerThread handlerThread;
-  private Handler handler;
-  private AdcReaderRunnable adcReaderRunnable = new AdcReaderRunnable();
+  private final HandlerThread handlerThread;
+  private final Handler handler;
+  private final AdcReaderRunnable adcReaderRunnable = new AdcReaderRunnable();
   private final int address;
   private final Pcf8591 pcf8591;
 

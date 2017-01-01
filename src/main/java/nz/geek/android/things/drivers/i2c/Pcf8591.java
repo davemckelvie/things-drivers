@@ -8,7 +8,6 @@ public class Pcf8591 extends BaseI2cDevice {
 
   private static final int BASE_ADDRESS = 0x48;
   private int control;
-  private int mode;
 
   /**
    * Device control byte values
@@ -63,7 +62,7 @@ public class Pcf8591 extends BaseI2cDevice {
   public int readChannel(int channel) {
     if (channel < 0 || channel > 3) return -1;
 
-    byte[] config = {(byte) (channel & control)};
+    byte[] config = new byte[]{(byte) ((channel | control) & 0xFF)};
     byte[] buffer = new byte[2];
     try {
       device.write(config, 1);
@@ -73,5 +72,4 @@ public class Pcf8591 extends BaseI2cDevice {
     }
     return (buffer[1] & 0xFF);
   }
-
 }
