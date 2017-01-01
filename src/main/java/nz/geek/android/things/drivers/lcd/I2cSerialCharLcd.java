@@ -17,6 +17,8 @@ package nz.geek.android.things.drivers.lcd;
 
 import nz.geek.android.things.drivers.i2c.Pcf8574;
 
+import static nz.geek.android.things.drivers.i2c.Pcf8574.BV;
+
 public class I2cSerialCharLcd implements Lcd {
 
   private static final int SPACE = 0x20;
@@ -130,15 +132,6 @@ public class I2cSerialCharLcd implements Lcd {
     controlMask = ~(en | rs | rw);
 
     createPort();
-  }
-
-  /**
-   * return the bit value of pin number
-   * @param pin number [0:7]
-   * @return bit value
-   */
-  private static int BV(int pin) {
-    return (1 << pin);
   }
 
   /**
@@ -312,8 +305,8 @@ public class I2cSerialCharLcd implements Lcd {
   public void setCgRam(int address, byte[] pattern) {
     int ac = readAddressCounter();
     writeCommand(LCD_SET_CG_RAM | address);   // set CGRAM address
-    for (int i = 0; i < pattern.length; i++) {
-      write(pattern[i]);
+    for (byte aPattern : pattern) {
+      write(aPattern);
     }
     writeCommand(ac);                 // restore address counter
   }
