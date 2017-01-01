@@ -4,9 +4,20 @@ import com.google.android.things.pio.I2cDevice;
 
 import java.io.IOException;
 
+/**
+ * Android Things driver for the PCF8591 Analog to Digital Converter
+ * http://www.nxp.com/documents/data_sheet/PCF8591.pdf
+ */
 public class Pcf8591 extends BaseI2cDevice {
 
+  /**
+   * Device base address
+   */
   private static final int BASE_ADDRESS = 0x48;
+
+  /**
+   * control byte to be written to device to configure features
+   */
   private int control;
 
   /**
@@ -55,21 +66,46 @@ public class Pcf8591 extends BaseI2cDevice {
     super.close();
   }
 
+  /**
+   * set the config value that will be written to the PCF8591
+   * @param configuration device configuration, refer datasheet
+   */
   public void configure(int configuration) {
     control = configuration;
   }
 
+  /**
+   * read a single ADC channel
+   * @param channel to read [0:3]
+   * @return ADC result
+   */
   public int readChannel(int channel) {
     if (channel < 0 || channel > 3) return -1;
 
-    byte[] config = new byte[]{(byte) ((channel | control) & 0xFF)};
+    byte[] config = {(byte) ((channel | control) & 0xFF)};
     byte[] buffer = new byte[2];
     try {
       device.write(config, 1);
-      device.read(buffer, 2);
+      device.read(buffer, buffer.length);
     } catch (IOException e) {
       // nah, bra
     }
     return (buffer[1] & 0xFF);
+  }
+
+  /**
+   * Read all ADC channels
+   * @return values for channels 0 - 3
+   */
+  public int[] readAllChannels() {
+    byte[] config = {(byte) (control | AUTO_INCREMENT)};
+    byte[] buffer = new byte[5];
+    try {
+      device.write(config, 1);
+      device.read(buffer, buffer.length);
+    } catch (IOException e) {
+      // nope
+    }
+    return new int[]{buffer[1] & 0xFF, buffer[2] & 0xFF, buffer[3] & 0xFF, buffer[4] & 0xFF};
   }
 }

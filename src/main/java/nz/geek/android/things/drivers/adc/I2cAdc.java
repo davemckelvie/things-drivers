@@ -6,6 +6,10 @@ import android.os.HandlerThread;
 import nz.geek.android.things.drivers.i2c.Pcf8591;
 
 import static nz.geek.android.things.drivers.i2c.Pcf8591.ANALOG_OUTPUT_ENABLE;
+import static nz.geek.android.things.drivers.i2c.Pcf8591.MODE_FOUR_SINGLE_ENDED;
+import static nz.geek.android.things.drivers.i2c.Pcf8591.MODE_THREE_DIFFERENTIAL;
+import static nz.geek.android.things.drivers.i2c.Pcf8591.MODE_TWO_DIFFERENTIAL;
+import static nz.geek.android.things.drivers.i2c.Pcf8591.MODE_TWO_SINGLE_ONE_DIFFERENTIAL;
 
 public class I2cAdc implements Adc {
 
@@ -23,16 +27,14 @@ public class I2cAdc implements Adc {
   private final HandlerThread handlerThread;
   private final Handler handler;
   private final AdcReaderRunnable adcReaderRunnable = new AdcReaderRunnable();
-  private final int address;
   private final Pcf8591 pcf8591;
 
-  public I2cAdc(int address) {
-    this.address = address;
+  private I2cAdc(int address, int mode) {
     handlerThread = new HandlerThread(Pcf8591.class.getSimpleName());
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
     pcf8591 = Pcf8591.create(address);
-    pcf8591.configure(ANALOG_OUTPUT_ENABLE);
+    pcf8591.configure(ANALOG_OUTPUT_ENABLE | mode);
   }
 
   @Override
@@ -58,15 +60,58 @@ public class I2cAdc implements Adc {
     pcf8591.close();
   }
 
+  public static I2cAdcBuilder builder() {
+    return new I2cAdcBuilder();
+  }
+
+  public static class I2cAdcBuilder {
+
+    private int address;
+    private int mode;
+
+    public I2cAdcBuilder address(int address) {
+      this.address = address;
+      return this;
+    }
+
+    public I2cAdcBuilder fourSingleEnded() {
+      mode = MODE_FOUR_SINGLE_ENDED;
+      return this;
+    }
+
+    public I2cAdcBuilder threeDifferential() {
+      mode = MODE_THREE_DIFFERENTIAL;
+      return this;
+    }
+
+    public I2cAdcBuilder twoSingleOneDifferential() {
+      mode = MODE_TWO_SINGLE_ONE_DIFFERENTIAL;
+      return this;
+    }
+
+    public I2cAdcBuilder twoDifferential() {
+      mode = MODE_TWO_DIFFERENTIAL;
+      return this;
+    }
+
+    public I2cAdc build() {
+      return new I2cAdc(address, mode);
+    }
+  }
+
   private class AdcReaderRunnable implements Runnable {
     private int currentChannel = 0;
 
     @Override
     public void run() {
-      values[currentChannel] = (values[currentChannel] + pcf8591.readChannel(currentChannel)) / 2;
-      if (++currentChannel > CHANNEL_MAX) {
-        currentChannel = CHANNEL_MIN;
+      int[] rawValues = pcf8591.readAllChannels();
+      for (int i = 0; i < CHANNEL_MAX; i++) {
+        values[i] = (values[i] + rawValues[i]) / 2;
       }
+//      values[currentChannel] = (values[currentChannel] + pcf8591.readChannel(currentChannel)) / 2;
+//      if (++currentChannel > CHANNEL_MAX) {
+//        currentChannel = CHANNEL_MIN;
+//      }
       handler.postDelayed(this, CONVERSION_PERIOD);
     }
   }
