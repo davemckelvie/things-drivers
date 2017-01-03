@@ -80,4 +80,9 @@ public interface Lcd {
    * @return LCD columns
    */
   int getHeight();
+
+  /**
+   * Load bargraph characters into CGRAM
+   */
+  void initBarGraph();
 }
