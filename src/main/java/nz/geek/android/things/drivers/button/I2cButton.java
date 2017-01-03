@@ -20,6 +20,7 @@ import static nz.geek.android.things.drivers.i2c.Pcf8574.BV;
 public class I2cButton {
   private static final String TAG = I2cButton.class.getSimpleName();
   private static final int DRIVER_VERSION = 1;
+  private static final int MAX_BUTTONS = 8; // 8 pin IO port
 
   private final Pcf8574 pcf8574;
   private final int address;
@@ -181,11 +182,23 @@ public class I2cButton {
 
     }
 
+    /**
+     * Specify the I2C address of the PCF8574. This is the value of A0-A2 pins, not
+     * the base address of the PCF8574 which is inferred with {@link #isPcf8574(boolean)}
+     * @param address value of A0-A2 [1:7]
+     * @return
+     */
     public final I2cButtonBuilder address(int address) {
       this.address = address;
       return this;
     }
 
+    /**
+     * Specify that the LCD is connected with a PCF8574. This uses a different
+     * base address to the more typical PCF8574A.
+     * @param isPcf8574 true when PCF8574 should be used
+     * @return
+     */
     public final I2cButtonBuilder isPcf8574(boolean isPcf8574) {
       this.isPcf8574 = isPcf8574;
       return this;
@@ -196,10 +209,16 @@ public class I2cButton {
       return this;
     }
 
+    /**
+     * Add a button with given pin and key code
+     * @param pin the pin number on the PCF8574 of this button [0:7]
+     * @param keyCode the key code of this button
+     * @return the builder
+     */
     public final I2cButtonBuilder addButton(int pin, int keyCode) {
       if (pin >= 0 && pin <= 7) {
         if (buttonMap == null) {
-          buttonMap = new ArrayMap<>(8);
+          buttonMap = new ArrayMap<>(MAX_BUTTONS);
         }
         buttonMap.put(pin, keyCode);
       }
