@@ -23,8 +23,6 @@ public class I2cButton {
   private static final int MAX_BUTTONS = 8; // 8 pin IO port
 
   private final Pcf8574 pcf8574;
-  private final int address;
-  private final boolean isPcf8574;
   private final Gpio gpio;
   private final Map<Integer, Integer> buttonMap;
   private int buttonMask = 0;
@@ -32,8 +30,6 @@ public class I2cButton {
   private InputDriver inputDriver;
 
   private I2cButton(int address, boolean isPcf8574, Gpio gpio, Map<Integer, Integer> buttonMap) {
-    this.address = address;
-    this.isPcf8574 = isPcf8574;
     this.gpio = gpio;
     this.buttonMap = buttonMap;
     pcf8574 = Pcf8574.create(address, isPcf8574);
@@ -152,10 +148,6 @@ public class I2cButton {
     }
   };
 
-  public int read() {
-    return pcf8574.readByte();
-  }
-
   public void close() {
     UserDriverManager manager = UserDriverManager.getManager();
     manager.unregisterInputDriver(inputDriver);
@@ -165,6 +157,9 @@ public class I2cButton {
       } catch (IOException e) {
         //
       }
+    }
+    if (pcf8574 != null) {
+      pcf8574.close();
     }
   }
 
