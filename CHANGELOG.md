@@ -1,7 +1,11 @@
+## 1.1.1 (2017-01-04)
+
+ - Added I2C Buttons
+
 ## 1.1.0 (2017-01-01)
 
  - Added PCF8591 ADC
- 
+
 ## 1.0.1 (2016-12-28)
 
  - Bugfix: backlight disabled when CGRAM written to
