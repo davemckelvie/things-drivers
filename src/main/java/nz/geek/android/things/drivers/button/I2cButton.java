@@ -1,5 +1,6 @@
 package nz.geek.android.things.drivers.button;
 
+import android.support.annotation.Nullable;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.view.InputDevice;
@@ -26,7 +27,7 @@ public class I2cButton {
   private final Gpio gpio;
   private final Map<Integer, Integer> buttonMap;
   private int buttonMask = 0;
-  private int buttonValue = 0xFF;
+  private int oldButtonValue = 0xFF;
   private InputDriver inputDriver;
 
   private I2cButton(int address, boolean isPcf8574, Gpio gpio, Map<Integer, Integer> buttonMap) {
@@ -114,24 +115,25 @@ public class I2cButton {
 
   /**
    * Read the current button state, send key event on state change
+   * TODO: key repeat?
    */
   private void readButtons() {
     int buttons = pcf8574.readByte();
 
-    if (buttons != buttonValue) {
+    if (buttons != oldButtonValue) {
       // What button has changes state?
       // "Output is 1 when both inputs are different." - Dr. Lee (XOR)
-      int changedButtons = buttons ^ buttonValue;
+      int changedButtons = buttons ^ oldButtonValue;
 
-      // TODO: seems like there should be a smarter way of doing this
       for (int key : buttonMap.keySet()) {
         int pinValue = BV(key);
         if ((pinValue & changedButtons) == pinValue) {
-          triggerEvent(!((pinValue & buttons) == pinValue), buttonMap.get(key));
+          boolean buttonPressed = !((pinValue & buttons) == pinValue);
+          triggerEvent(buttonPressed, buttonMap.get(key));
         }
       }
 
-      buttonValue = buttons;
+      oldButtonValue = buttons;
     }
   }
 
@@ -181,7 +183,7 @@ public class I2cButton {
      * Specify the I2C address of the PCF8574. This is the value of A0-A2 pins, not
      * the base address of the PCF8574 which is inferred with {@link #isPcf8574(boolean)}
      * @param address value of A0-A2 [1:7]
-     * @return
+     * @return builder
      */
     public final I2cButtonBuilder address(int address) {
       this.address = address;
@@ -192,14 +194,19 @@ public class I2cButton {
      * Specify that the LCD is connected with a PCF8574. This uses a different
      * base address to the more typical PCF8574A.
      * @param isPcf8574 true when PCF8574 should be used
-     * @return
+     * @return builder
      */
     public final I2cButtonBuilder isPcf8574(boolean isPcf8574) {
       this.isPcf8574 = isPcf8574;
       return this;
     }
 
-    public final I2cButtonBuilder withInterrupt(Gpio gpio) {
+    /**
+     * Specify the GPIO that the INT pin of the PCF8574 is connected to.
+     * @param gpio the GPIO returned from {@link com.google.android.things.pio.PeripheralManagerService#openGpio(String)}
+     * @return builder
+     */
+    public final I2cButtonBuilder withInterrupt(@Nullable Gpio gpio) {
       this.gpio = gpio;
       return this;
     }
@@ -223,6 +230,5 @@ public class I2cButton {
     public I2cButton build() {
       return new I2cButton(address, isPcf8574, gpio, buttonMap);
     }
-
   }
 }
