@@ -32,7 +32,7 @@ public class I2cAdc implements Adc {
 
   private I2cAdc(int address, int mode, int conversionRate) {
     this.conversionRate = conversionRate;
-    handlerThread = new HandlerThread(Pcf8591.class.getSimpleName());
+    handlerThread = new HandlerThread(I2cAdc.class.getSimpleName());
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
     pcf8591 = Pcf8591.create(address);

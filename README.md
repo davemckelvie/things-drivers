@@ -18,13 +18,19 @@ HD44870 type displays (via LCM1602)
 
 ![Raspberry Pi Hookup](rpi3_lcd.png)
 
+## Buttons
+
+Push buttons connected via PCF8574
+
+![Raspberry Pi Hookup](rpi3_buttons_lcd.png)
+
 ## How to use
 
 1. Create an Android Things project as described [here](https://developer.android.com/things/training/first-device/create-studio-project.html)
 2. Add the following to your project's `build.gradle`
 ```
 dependencies {
-    compile 'nz.geek.android.things:things-drivers:1.1.0'
+    compile 'nz.geek.android.things:things-drivers:1.1.1'
 }
 ```
 3. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height
