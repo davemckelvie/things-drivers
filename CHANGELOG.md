@@ -1,3 +1,8 @@
+## 1.1.2 (2017-01-10)
+
+ - add methods to give I2C bus to ADC and LCD builders
+ - the end of the binary version numbering (I thought it was funny)
+
 ## 1.1.1 (2017-01-04)
 
  - Added I2C Buttons

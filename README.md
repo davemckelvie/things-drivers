@@ -30,7 +30,7 @@ Push buttons connected via PCF8574
 2. Add the following to your project's `build.gradle`
 ```
 dependencies {
-    compile 'nz.geek.android.things:things-drivers:1.1.1'
+    compile 'nz.geek.android.things:things-drivers:1.1.2'
 }
 ```
 3. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height
