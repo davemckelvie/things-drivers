@@ -54,14 +54,13 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
   }
 
   /**
-   *
-   * @param address value of A0-A2 for your board
-   * @return
+   * Create a pcf8574 with the given address
+   * @param address value of A0-A2 for your pcf8574
+   * @param isPcf8574 is a PCF8574 (not a PCF8574A)
+   * @return new Pcf8574
    */
   public static Pcf8574 create(int address, boolean isPcf8574) {
-    int fullAddress = (isPcf8574 ? BASE_ADDRESS_PCF8574 : BASE_ADDRESS) + address;
-    I2cDevice device = getDevice(getBus(), fullAddress);
-    return new Pcf8574(device, fullAddress);
+    return create(address, getBus(), isPcf8574);
   }
 
   /**
@@ -69,6 +68,7 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
    * given bus.
    * @param address value of A0-A2 for your Pcf8574
    * @param bus the I2C bus the device is on
+   * @param isPcf8574 is a PCF8574 (not a PCF8574A)
    * @return new Pcf8574
    */
   public static Pcf8574 create(int address, String bus, boolean isPcf8574) {
