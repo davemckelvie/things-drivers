@@ -15,6 +15,8 @@
  */
 package nz.geek.android.things.drivers.lcd;
 
+import com.google.android.things.pio.PeripheralManagerService;
+
 import nz.geek.android.things.drivers.i2c.Pcf8574;
 
 import static nz.geek.android.things.drivers.i2c.Pcf8574.BV;
@@ -97,6 +99,7 @@ public class I2cSerialCharLcd implements Lcd {
   private final int address;
   private final boolean isPcf8574;
   private final boolean hasBackLight;
+  private final String bus;
 
   /**
    * pin numbers [0:7]
@@ -110,7 +113,8 @@ public class I2cSerialCharLcd implements Lcd {
   private I2cSerialCharLcd(int width, int height, int address,
                            int ePin, int e2Pin, int rsPin, int rwPin,
                            int d4Pin, int d5Pin, int d6Pin, int d7Pin,
-                           boolean isPcf8574, boolean hasBl, int blPin) {
+                           boolean isPcf8574, boolean hasBl, int blPin,
+                           String bus) {
     this.width = width;
     this.height = height;
     this.address = address;
@@ -121,6 +125,7 @@ public class I2cSerialCharLcd implements Lcd {
     this.rwPin = rwPin;
     this.blPin = blPin;
     this.hasBackLight = hasBl;
+    this.bus = bus;
 
     // setup the masks and bit positions from pin numbers
     en = BV(ePin);
@@ -138,7 +143,11 @@ public class I2cSerialCharLcd implements Lcd {
    * create the I2C IO port (PCF8574)
    */
   private void createPort() {
-    pcf8574 = Pcf8574.create(address, isPcf8574);
+    if (bus != null) {
+      pcf8574 = Pcf8574.create(address, bus, isPcf8574);
+    } else {
+      pcf8574 = Pcf8574.create(address, isPcf8574);
+    }
   }
 
   @Override
@@ -349,7 +358,7 @@ public class I2cSerialCharLcd implements Lcd {
   }
 
   /**
-   * Builder used to create a {@link #I2cSerialCharLcd(int, int, int, int, int, int, int, int, int, int, int, boolean, boolean, int)}
+   * Builder used to create a {@link #I2cSerialCharLcd(int, int, int, int, int, int, int, int, int, int, int, boolean, boolean, int, String)}
    */
   public static final class I2cSerialCharLcdBuilder {
     private int width;
@@ -366,6 +375,7 @@ public class I2cSerialCharLcd implements Lcd {
     private int address;
     private boolean isPcf8574 = false; // i.e., not pcf8574A, default to no
     private boolean hasBackLight = false;
+    private String bus = null;
 
     /*package*/ I2cSerialCharLcdBuilder(int width, int height) {
       this.width = width;
@@ -469,12 +479,22 @@ public class I2cSerialCharLcd implements Lcd {
     }
 
     /**
+     * Specify the name of the I2C bus that the LCD is connected to
+     * @param bus the name of the bus returned from {@link PeripheralManagerService#getI2cBusList()}
+     * @return the builder
+     */
+    public I2cSerialCharLcdBuilder withBus(String bus) {
+      this.bus = bus;
+      return this;
+    }
+
+    /**
      * Build the LCD
-     * @return A new {@link #I2cSerialCharLcd(int, int, int, int, int, int, int, int, int, int, int, boolean, boolean, int)} with your pin mapping.
+     * @return A new {@link #I2cSerialCharLcd(int, int, int, int, int, int, int, int, int, int, int, boolean, boolean, int, String)} with your pin mapping.
      */
     public I2cSerialCharLcd build() {
       return new I2cSerialCharLcd(width, height, address, e1Pin, e2Pin, rsPin, rwPin,
-              d4Pin, d5Pin, d6Pin, d7Pin, isPcf8574, hasBackLight, blPin);
+              d4Pin, d5Pin, d6Pin, d7Pin, isPcf8574, hasBackLight, blPin, bus);
     }
   }
 }
