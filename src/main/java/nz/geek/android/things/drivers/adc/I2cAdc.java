@@ -30,12 +30,16 @@ public class I2cAdc implements Adc {
   private final Pcf8591 pcf8591;
   private final int conversionRate;
 
-  private I2cAdc(int address, int mode, int conversionRate) {
+  private I2cAdc(int address, int mode, int conversionRate, String bus) {
     this.conversionRate = conversionRate;
     handlerThread = new HandlerThread(I2cAdc.class.getSimpleName());
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
-    pcf8591 = Pcf8591.create(address);
+    if (bus != null) {
+      pcf8591 = Pcf8591.create(address, bus);
+    } else {
+      pcf8591 = Pcf8591.create(address);
+    }
     pcf8591.configure(ANALOG_OUTPUT_ENABLE | mode);
   }
 
@@ -71,6 +75,7 @@ public class I2cAdc implements Adc {
     private int address;
     private int mode;
     private int rate = DEFAULT_RATE;
+    private String bus = null;
 
     public I2cAdcBuilder address(int address) {
       this.address = address;
@@ -102,8 +107,13 @@ public class I2cAdc implements Adc {
       return this;
     }
 
+    public I2cAdcBuilder withBus(String bus) {
+      this.bus = bus;
+      return this;
+    }
+
     public I2cAdc build() {
-      return new I2cAdc(address, mode, rate);
+      return new I2cAdc(address, mode, rate, bus);
     }
   }
 
