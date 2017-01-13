@@ -23,6 +23,9 @@ import java.io.IOException;
 
 import nz.geek.android.things.drivers.i2c.Tcs34725;
 
+/**
+ * Wrapper class for the TCS34725 colour sensor
+ */
 public class ColourSensor {
 
   private Tcs34725 tcs34725;
@@ -38,6 +41,15 @@ public class ColourSensor {
     }
   };
 
+  /**
+   * private constructor, use {@link ColourSensorBuilder} to create.
+   * @param bus the I2C bus that the sensor is connected to.
+   * @param ledGpio the {@link Gpio} that the sensor LED is connected to. (optional)
+   * @param ledGpioName the name of the {@link Gpio}, a String returned by {@link PeripheralManagerService#getGpioList()} (optional)
+   * @param interruptGpio the {@link Gpio} to use as and interrupt from the sensor. (optional)
+   * @param interruptGpioName the name of the {@link Gpio}, a String returned by {@link PeripheralManagerService#getGpioList()} (optional)
+   * @param listener a {@link ColourSensor.Listener} interested in sensor readings (optional)
+   */
   private ColourSensor(String bus, Gpio ledGpio, String ledGpioName, Gpio interruptGpio, String interruptGpioName,
                        ColourSensor.Listener listener) {
 
@@ -57,6 +69,9 @@ public class ColourSensor {
     tcs34725.setListener(listener);
   }
 
+  /**
+   * A listener to be notified of sensor readings
+   */
   public interface Listener {
     void onColourUpdated(int clear, int red, int green, int blue);
   }
@@ -147,11 +162,11 @@ public class ColourSensor {
     }
   }
 
-  public static ColourSensor.Builder builder() {
-    return new Builder();
+  public static ColourSensorBuilder builder() {
+    return new ColourSensorBuilder();
   }
 
-  public static final class Builder {
+  public static final class ColourSensorBuilder {
     private String bus = null;
     private Gpio ledGpio = null;
     private String ledGpioName = null;
@@ -165,7 +180,7 @@ public class ColourSensor {
      * @param bus the name of a I2C bus returned by {@link PeripheralManagerService#getI2cBusList()}
      * @return the builder
      */
-    public Builder withBus(String bus) {
+    public ColourSensorBuilder withBus(String bus) {
       this.bus = bus;
       return this;
     }
@@ -176,7 +191,7 @@ public class ColourSensor {
      * @param gpio the {@link Gpio} returned by {@link PeripheralManagerService#openGpio(String)}
      * @return the builder
      */
-    public Builder withLedGpio(Gpio gpio) {
+    public ColourSensorBuilder withLedGpio(Gpio gpio) {
       this.ledGpio = gpio;
       return this;
     }
@@ -188,7 +203,7 @@ public class ColourSensor {
      * @param gpioName the name of the {@link Gpio} to use
      * @return the builder
      */
-    public Builder withLedGpio(String gpioName) {
+    public ColourSensorBuilder withLedGpio(String gpioName) {
       this.ledGpioName = gpioName;
       return this;
     }
@@ -198,7 +213,7 @@ public class ColourSensor {
      * @param gpio the {@link Gpio} returned by {@link PeripheralManagerService#openGpio(String)}
      * @return the builder
      */
-    public Builder withInterruptGpio(Gpio gpio) {
+    public ColourSensorBuilder withInterruptGpio(Gpio gpio) {
       this.interruptGpio = gpio;
       return this;
     }
@@ -210,7 +225,7 @@ public class ColourSensor {
      * @param gpioName the name of the {@link Gpio} to use
      * @return the builder
      */
-    public Builder withInterruptGpio(String gpioName) {
+    public ColourSensorBuilder withInterruptGpio(String gpioName) {
       this.interruptGpioName = gpioName;
       return this;
     }
@@ -220,7 +235,7 @@ public class ColourSensor {
      * @param listener
      * @return the builder
      */
-    public Builder withListener(ColourSensor.Listener listener) {
+    public ColourSensorBuilder withListener(ColourSensor.Listener listener) {
       this.listener = listener;
       return this;
     }

@@ -144,22 +144,21 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   public void setGain(int gain) {
     if (gain > 0 && gain < 4) {
-      try {
-        device.writeRegByte(CONTROL, (byte) (gain & 0xFF));
-      } catch (IOException e) {
-        //
-      }
+      writeRegister(CONTROL, gain);
     }
   }
 
   public void setIntegrationTime(float time) {
     if (time < 2.4f || time > 614f) return; // out of range
     int atime = (int) (256 - (time / 2.4));
-    try {
-      device.writeRegByte(ATIME, (byte) (atime & 0xFF));
-    } catch (IOException e) {
-      //
-    }
+    writeRegister(ATIME, atime);
+  }
+
+  // TODO: set longer times (WLONG)
+  public void setWaitTime(float time) {
+    if (time < 2.4f || time > 614f) return; // out of range
+    int atime = (int) (256 - (time / 2.4));
+    writeRegister(WTIME, atime);
   }
 
   public void setInterruptThresholds(int lower, int upper) {
@@ -171,37 +170,52 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
     }
   }
 
+  /**
+   * @param persistence [0:15]
+   * 0000 Every RGBC cycle generates an interrupt
+   * 0001 1 clear channel value outside of threshold range
+   * 0010 2 clear channel consecutive values out of range
+   * 0011 3 clear channel consecutive values out of range
+   * 0100 5 clear channel consecutive values out of range
+   * 0101 10 clear channel consecutive values out of range
+   * 0110 15 clear channel consecutive values out of range
+   * 0111 20 clear channel consecutive values out of range
+   * 1000 25 clear channel consecutive values out of range
+   * 1001 30 clear channel consecutive values out of range
+   * 1010 35 clear channel consecutive values out of range
+   * 1011 40 clear channel consecutive values out of range
+   * 1100 45 clear channel consecutive values out of range
+   * 1101 50 clear channel consecutive values out of range
+   * 1110 55 clear channel consecutive values out of range
+   * 1111 60 clear channel consecutive values out of range
+   */
   public void setInterruptPersistence(int persistence) {
-
+    if (persistence > 0 && persistence < 16) {
+      writeRegister(PERS, persistence);
+    }
   }
 
   public void enableInterrupt(boolean enable) {
-    try {
-      int enableRegister = device.readRegByte(ENABLE);
-      byte en = (byte) (enable ? (enableRegister | AIEN) : (enableRegister & ~AIEN));
-      device.writeRegByte(ENABLE, en);
-    } catch (IOException e) {
-      //
-    }
+    int enableRegister = readRegister(ENABLE);
+    int en = enable ? (enableRegister | AIEN) : (enableRegister & ~AIEN);
+    writeRegister(ENABLE, en);
+  }
+
+  public void enableWaitTime(boolean enable) {
+    int enableRegister = readRegister(ENABLE);
+    int en = enable ? (enableRegister | WEN) : (enableRegister & ~WEN);
+    writeRegister(ENABLE, en);
   }
 
   public void enable(boolean enable) {
     initHandler();
-    try {
-      byte en = device.readRegByte(ENABLE);
-
-      if (enable) {
-        en |= ((byte) (PON | AEN));
-        handler.postDelayed(this, UPDATE_PERIOD);
-      } else {
-        en &= ~((byte) (PON | AEN));
-        handler.removeCallbacks(this);
-      }
-
-      device.writeRegByte(ENABLE, en);
-
-    } catch (IOException e) {
-      //
+    int enableRegister = readRegister(ENABLE);
+    int en = enable ? (enableRegister | PON | AEN) : (enableRegister & ~(PON | AEN));
+    writeRegister(ENABLE, en);
+    if (enable) {
+      handler.postDelayed(this, UPDATE_PERIOD);
+    } else {
+      handler.removeCallbacks(this);
     }
   }
 
@@ -220,6 +234,14 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
       //
     }
     return -1;
+  }
+
+  private void writeRegister(int reg, int data) {
+    try {
+      device.writeRegByte(reg, (byte) (data & 0xFF));
+    } catch (IOException e) {
+      //
+    }
   }
 
   private void readColour() {
@@ -245,7 +267,6 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   @Override
   public void run() {
-    // read colour
     readColour();
     handler.postDelayed(this, UPDATE_PERIOD);
   }
