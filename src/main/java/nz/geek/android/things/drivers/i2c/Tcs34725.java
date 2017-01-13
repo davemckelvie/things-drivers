@@ -17,13 +17,11 @@ package nz.geek.android.things.drivers.i2c;
 
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.util.Log;
 
 import com.google.android.things.pio.I2cDevice;
 import com.google.android.things.pio.PeripheralManagerService;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import nz.geek.android.things.drivers.colour.ColourSensor;
 
@@ -256,7 +254,6 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   private void notifyListener(byte[] data) {
     if (listener != null && data.length >= 8) {
-      Log.d(TAG, "notifyListener: " + Arrays.toString(data));
       int clear = (data[0] & 0xFF) | (data[1] << 8);
       int red   = (data[2] & 0xFF) | (data[3] << 8);
       int green = (data[4] & 0xFF) | (data[5] << 8);
