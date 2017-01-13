@@ -24,13 +24,19 @@ Push buttons connected via PCF8574
 
 ![Raspberry Pi Hookup](rpi3_buttons_lcd.png)
 
+## Colour sensor
+
+TCS34725 I2C Colour sensor
+
+![Raspberry Pi Hookup](rpi3_tcs34725.png)
+
 ## How to use
 
 1. Create an Android Things project as described [here](https://developer.android.com/things/training/first-device/create-studio-project.html)
 2. Add the following to your project's `build.gradle`
 ```
 dependencies {
-    compile 'nz.geek.android.things:things-drivers:1.1.2'
+    compile 'nz.geek.android.things:things-drivers:1.2.0'
 }
 ```
 3. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height

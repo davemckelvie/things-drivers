@@ -1,3 +1,7 @@
+## 1.2.0 (2017-01-14)
+
+ - add TCS34725 colour sensor
+
 ## 1.1.2 (2017-01-10)
 
  - add methods to give I2C bus to ADC and LCD builders
