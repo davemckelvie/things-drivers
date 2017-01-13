@@ -138,6 +138,7 @@ public class ColourSensor {
   public void enable(boolean enable) {
     if (tcs34725 != null) {
       tcs34725.enable(enable);
+      enableLed(enable);
     }
   }
 
