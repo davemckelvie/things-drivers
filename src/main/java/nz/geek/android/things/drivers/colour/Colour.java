@@ -39,14 +39,30 @@ public class Colour {
     return raw[RED_INDEX];
   }
 
+  /**
+   * Calculate lux (Illuminance) for the given RGB values
+   * @param red sensor value
+   * @param green sensor value
+   * @param blue sensor value
+   * @return lux
+   */
   public static int toLux(int red, int green, int blue) {
     return (int) ((-0.32466f * (float) red) + (1.57837f * (float) green) + (-0.73191f * (float) blue));
   }
 
-  public static int toLux(int[] raw) {
+  private int toLux(int[] raw) {
     return toLux(raw[RED_INDEX], raw[GREEN_INDEX], raw[BLUE_INDEX]);
   }
 
+  /**
+   * Calculate the Correlated Colour Temperature (CCT) from the given
+   * RGB values. Formula taken from http://ams.com/eng/content/view/download/145158
+   * (TAOS Design Note 25 DN25)
+   * @param red value from sensor
+   * @param green value from sensor
+   * @param blue value from sensor
+   * @return CCT
+   */
   public static int toColourTemperature(int red, int green, int blue) {
     float X, Y, Z, xc, yc, n;
 
@@ -62,7 +78,8 @@ public class Colour {
     return (int) ((449.0F * Math.pow(n, 3)) + (3525.0F * Math.pow(n, 2)) + (6823.3F * n) + 5520.33F);
   }
 
-  public static int toColourTemperature(int[] raw) {
+  private int toColourTemperature(int[] raw) {
+    if (raw == null || raw.length < 3) return -1;
     return toColourTemperature(raw[RED_INDEX], raw[GREEN_INDEX], raw[BLUE_INDEX]);
   }
 }

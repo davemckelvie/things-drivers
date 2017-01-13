@@ -15,10 +15,35 @@
  */
 package nz.geek.android.things.drivers;
 
+/**
+ * Interface for an 8 bit IO port see {@link nz.geek.android.things.drivers.i2c.Pcf8574} for implementation
+ */
 public interface IoPort {
-  boolean writeByte(int mask, int data);
-  int readValue();
-  void setPin(int pin, boolean state);
-  void close();
 
+  /**
+   * write a 'byte' to the port. This takes an {@link int} the LSB of the int is used.
+   * @param mask data does not affect port state when mask bit is 1
+   * @param data the data to write to the port
+   * @return true when the data is written successfully
+   */
+  boolean writeByte(int mask, int data);
+
+  /**
+   * Read the current state of the port. The LSB of the returned int will be
+   * the value last written to the port.
+   * @return
+   */
+  int readValue();
+
+  /**
+   * set the given port pin to the given value
+   * @param pin the pin to set [0:7]
+   * @param state true to set it, false to clear it
+   */
+  void setPin(int pin, boolean state);
+
+  /**
+   * Close the port. The port is invalid after being closed.
+   */
+  void close();
 }

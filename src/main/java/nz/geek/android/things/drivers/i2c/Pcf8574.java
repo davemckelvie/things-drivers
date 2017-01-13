@@ -80,7 +80,7 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
   /**
    * return the bit value of pin number
    * @param pin number [0:7]
-   * @return bit value
+   * @return bit value [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80]
    */
   public static int BV(int pin) {
     return (1 << pin);
@@ -127,8 +127,8 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
   @Override
   public void setPin(int pin, boolean state) {
     if (pin > 7) return;
-    int mask = ~(1 << pin);
-    int data = state ? 1 << pin : 0;
+    int mask = ~BV(pin);
+    int data = state ? BV(pin) : 0;
     writeByte(mask, data & 0xFF);
   }
 

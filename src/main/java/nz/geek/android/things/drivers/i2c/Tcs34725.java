@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nz.geek.android.things.drivers.colour;
+package nz.geek.android.things.drivers.i2c;
 
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
-import com.google.android.things.pio.Gpio;
-import com.google.android.things.pio.GpioCallback;
 import com.google.android.things.pio.I2cDevice;
+import com.google.android.things.pio.PeripheralManagerService;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import nz.geek.android.things.drivers.i2c.BaseI2cDevice;
+import nz.geek.android.things.drivers.colour.ColourSensor;
 
 public class Tcs34725 extends BaseI2cDevice implements Runnable {
   private static final String TAG = Tcs34725.class.getSimpleName();
@@ -90,28 +89,52 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   /* package */ Tcs34725(I2cDevice device, int address) {
     super(device, address);
-    handlerThread = new HandlerThread(TAG);
-    handlerThread.start();
-    handler = new Handler(handlerThread.getLooper());
+    initHandler();
   }
 
+  private void initHandler() {
+    if (handlerThread == null) {
+      handlerThread = new HandlerThread(TAG);
+      handlerThread.start();
+    }
+    if (handler == null) {
+      handler = new Handler(handlerThread.getLooper());
+    }
+  }
+
+  /**
+   * Create a {@link Tcs34725} on the first I2C bus returned by {@link PeripheralManagerService#getI2cBusList()}.
+   * To specify I2C bus use {@link Tcs34725#create(String)}
+   * @return newly created {@link Tcs34725}
+   */
   public static Tcs34725 create() {
     return create(getBus());
   }
 
+  /**
+   * Create a {@link Tcs34725} on the given I2C bus.
+   * @param bus I2C bus, one of the Strings returned by {@link PeripheralManagerService#getI2cBusList()}
+   * @return newly created {@link Tcs34725}
+   */
   public static Tcs34725 create(String bus) {
     int fullAddress = BASE_ADDRESS;
     I2cDevice device = getDevice(bus, fullAddress);
     return new Tcs34725(device, fullAddress);
   }
 
+  /**
+   * Close sensor and tidy up treads. After a call to {@link #close()} the {@link Tcs34725} is invalid
+   * and should not be used.
+   */
   public void close() {
     super.close();
     if (handler != null) {
       handler.removeCallbacks(this);
+      handler = null;
     }
     if (handlerThread != null) {
       handlerThread.quitSafely();
+      handlerThread = null;
     }
   }
 
@@ -163,6 +186,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   public void enable(boolean enable) {
+    initHandler();
     try {
       byte en = device.readRegByte(ENABLE);
 

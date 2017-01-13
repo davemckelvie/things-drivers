@@ -21,6 +21,8 @@ import com.google.android.things.pio.PeripheralManagerService;
 
 import java.io.IOException;
 
+import nz.geek.android.things.drivers.i2c.Tcs34725;
+
 public class ColourSensor {
 
   private Tcs34725 tcs34725;
