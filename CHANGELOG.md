@@ -1,3 +1,7 @@
+## 1.2.1 (2017-01-14)
+
+  - bugfix: update control mask when switching display
+
 ## 1.2.0 (2017-01-14)
 
  - add TCS34725 colour sensor
