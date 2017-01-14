@@ -85,7 +85,7 @@ public class I2cSerialCharLcd implements Lcd {
   /**
    * control mask will change when using 40x4 displays with two enable pins
    */
-  private final int controlMask;
+  private int controlMask;
 
   /**
    * data mask bit value
@@ -150,6 +150,10 @@ public class I2cSerialCharLcd implements Lcd {
     }
   }
 
+  private boolean isDoubleDisplay() {
+    return (width * height > 80);
+  }
+
   @Override
   public void connect() {
     if (pcf8574 == null) createPort();
@@ -173,7 +177,7 @@ public class I2cSerialCharLcd implements Lcd {
   public void print(int line, String message) {
 
     // support displays with more than 80 characters (will have 2 enable pins)
-    if ((width * height > 80) && line > 2) {
+    if (isDoubleDisplay() && line > 2) {
         // lines 3 and 4 only
         line -= 2;
         switchDisplay(2);
@@ -265,6 +269,7 @@ public class I2cSerialCharLcd implements Lcd {
     } else {
       en = BV(ePin);
     }
+    controlMask = ~(en | rs | rw);
   }
 
   private void init() {
@@ -273,7 +278,7 @@ public class I2cSerialCharLcd implements Lcd {
     switchDisplay(1);
     pcf8574.writeByte(0x00, 0x00);
     initialiseLcd();
-    if (width * height > 80) {
+    if (isDoubleDisplay()) {
       switchDisplay(2);
       initialiseLcd();
       switchDisplay(1);
