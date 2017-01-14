@@ -2,6 +2,8 @@
 
 Here you will find some Android Things um, things, drivers and such.
 
+[ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-drivers/images/download.svg) ](https://bintray.com/davemckelvie/maven/things-drivers/_latestVersion)
+
 ## I2C Things
 
 PCF8574(A)
@@ -33,10 +35,10 @@ TCS34725 I2C Colour sensor
 ## How to use
 
 1. Create an Android Things project as described [here](https://developer.android.com/things/training/first-device/create-studio-project.html)
-2. Add the following to your project's `build.gradle`
+2. Add the following to your project's `build.gradle` replace <version> with [latest version](https://bintray.com/davemckelvie/maven/things-drivers/_latestVersion)
 ```
 dependencies {
-    compile 'nz.geek.android.things:things-drivers:1.2.1'
+    compile 'nz.geek.android.things:things-drivers:<version>'
 }
 ```
 3. create the lcd object using an `I2cSerialCharLcd.builder()` passing module width and height
