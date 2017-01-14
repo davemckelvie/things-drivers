@@ -1,3 +1,7 @@
+## 1.2.2 (2017-01-15)
+
+  - bugfix: initialise CGRAM on 4004 LCD displays [issue 8](https://github.com/davemckelvie/things-drivers/issues/8)
+
 ## 1.2.1 (2017-01-14)
 
   - bugfix: update control mask when switching display

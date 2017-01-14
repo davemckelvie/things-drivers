@@ -22,7 +22,7 @@ import nz.geek.android.things.drivers.i2c.Pcf8574;
 import static nz.geek.android.things.drivers.i2c.Pcf8574.BV;
 
 public class I2cSerialCharLcd implements Lcd {
-
+  
   private static final int SPACE = 0x20;
 
   /**
@@ -178,9 +178,9 @@ public class I2cSerialCharLcd implements Lcd {
 
     // support displays with more than 80 characters (will have 2 enable pins)
     if (isDoubleDisplay() && line > 2) {
-        // lines 3 and 4 only
-        line -= 2;
-        switchDisplay(2);
+      // lines 3 and 4 only
+      line -= 2;
+      switchDisplay(2);
     }
 
     writeCommand(LCD_SET_DD_RAM | lineToAddress(line));
@@ -236,33 +236,6 @@ public class I2cSerialCharLcd implements Lcd {
     }
   }
 
-  private int readAddressCounterAndBusyFlag() {
-    // set D7 - D4 bits high before use as inputs in accordance with PCF8574 data sheet.
-    pcf8574.writeByte(dataMask, 0xFF);            // D0-7 = 0xFF
-    pcf8574.writeByte(controlMask, rw);           // RS = 0, E = 0, R/W = 1
-    pcf8574.writeByte(controlMask, rw | en);      // RS = 0, E = 1, R/W = 1
-    int reg = pcf8574.readByte();                 // D7 = busy flag
-    pcf8574.writeByte(controlMask, rw);           // RS = 0, E = 0, R/W = 1
-
-    if (doubleWrite) {
-      pcf8574.writeByte(controlMask, rw | en);    // RS = 0, E = 1, R/W = 1
-      int dummy = pcf8574.readByte();
-      pcf8574.writeByte(controlMask, rw);         // RS = 0, E = 0, R/W = 1
-    }
-    pcf8574.writeByte(controlMask, 0);            // RS = 0, E = 0, R/W = 0
-    pcf8574.writeByte(dataMask, 0);               // D0-7 = 0
-
-    return reg;
-  }
-
-  private boolean readBusyFlag() {
-    return (readAddressCounterAndBusyFlag() & LCD_BF) == LCD_BF;
-  }
-
-  private int readAddressCounter() {
-    return (readAddressCounterAndBusyFlag() & 0x7F);
-  }
-
   private void switchDisplay(int display) {
     if (display == 2) {
       en = BV(e2Pin);
@@ -315,14 +288,21 @@ public class I2cSerialCharLcd implements Lcd {
     }
   }
 
-  @Override
-  public void setCgRam(int address, byte[] pattern) {
-    int ac = readAddressCounter();
+  private void setCgRamPattern(int address, byte[] pattern) {
     writeCommand(LCD_SET_CG_RAM | address);   // set CGRAM address
     for (byte aPattern : pattern) {
       write(aPattern);
     }
-    writeCommand(ac);                 // restore address counter
+  }
+
+  @Override
+  public void setCgRam(int address, byte[] pattern) {
+    setCgRamPattern(address, pattern);
+    if (isDoubleDisplay()) {
+      switchDisplay(2);
+      setCgRamPattern(address, pattern);
+      switchDisplay(1);
+    }
   }
 
   @Override
