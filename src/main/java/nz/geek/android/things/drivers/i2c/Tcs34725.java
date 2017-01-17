@@ -30,7 +30,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   private static final int BASE_ADDRESS = 0x29;
 
-  private static final int UPDATE_PERIOD = 2000;
+  private static final int UPDATE_PERIOD = 200;
 
   /* TCS34725 Registers */
   private static final int COMMAND = 0x80;  //   −− COMMAND W Specifies register address 0x00
@@ -72,10 +72,10 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
                                           // WTIME register
   
   /* CONTROL register values */
-  private static final int GAIN_1 = 0x00;
-  private static final int GAIN_4 = 0x01;
-  private static final int GAIN_16 = 0x02;
-  private static final int GAIN_60 = 0x03;
+  public static final int GAIN_1 = 0x00;
+  public static final int GAIN_4 = 0x01;
+  public static final int GAIN_16 = 0x02;
+  public static final int GAIN_60 = 0x03;
 
   /* STATUS register values */
   private static final int AINT = 0x10;   // RGBC clear channel Interrupt.
@@ -169,26 +169,28 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   /**
+   * <pre>
+   * 0 Every RGBC cycle generates an interrupt
+   * 1 1 clear channel value outside of threshold range
+   * 2 2 clear channel consecutive values out of range
+   * 3 3 clear channel consecutive values out of range
+   * 4 5 clear channel consecutive values out of range
+   * 5 10 clear channel consecutive values out of range
+   * 6 15 clear channel consecutive values out of range
+   * 7 20 clear channel consecutive values out of range
+   * 8 25 clear channel consecutive values out of range
+   * 9 30 clear channel consecutive values out of range
+   * 10 35 clear channel consecutive values out of range
+   * 11 40 clear channel consecutive values out of range
+   * 12 45 clear channel consecutive values out of range
+   * 13 50 clear channel consecutive values out of range
+   * 14 55 clear channel consecutive values out of range
+   * 15 60 clear channel consecutive values out of range
+   * </pre>
    * @param persistence [0:15]
-   * 0000 Every RGBC cycle generates an interrupt
-   * 0001 1 clear channel value outside of threshold range
-   * 0010 2 clear channel consecutive values out of range
-   * 0011 3 clear channel consecutive values out of range
-   * 0100 5 clear channel consecutive values out of range
-   * 0101 10 clear channel consecutive values out of range
-   * 0110 15 clear channel consecutive values out of range
-   * 0111 20 clear channel consecutive values out of range
-   * 1000 25 clear channel consecutive values out of range
-   * 1001 30 clear channel consecutive values out of range
-   * 1010 35 clear channel consecutive values out of range
-   * 1011 40 clear channel consecutive values out of range
-   * 1100 45 clear channel consecutive values out of range
-   * 1101 50 clear channel consecutive values out of range
-   * 1110 55 clear channel consecutive values out of range
-   * 1111 60 clear channel consecutive values out of range
    */
   public void setInterruptPersistence(int persistence) {
-    if (persistence > 0 && persistence < 16) {
+    if (persistence >= 0 && persistence < 16) {
       writeRegister(PERS, persistence);
     }
   }
@@ -207,6 +209,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   public void enable(boolean enable) {
     initHandler();
+
     int enableRegister = readRegister(ENABLE);
     int en = enable ? (enableRegister | PON | AEN) : (enableRegister & ~(PON | AEN));
     writeRegister(ENABLE, en);
@@ -254,10 +257,10 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   private void notifyListener(byte[] data) {
     if (listener != null && data.length >= 8) {
-      int clear = (data[0] & 0xFF) | (data[1] << 8);
-      int red   = (data[2] & 0xFF) | (data[3] << 8);
-      int green = (data[4] & 0xFF) | (data[5] << 8);
-      int blue  = (data[6] & 0xFF) | (data[7] << 8);
+      int clear = ((data[0] & 0xFF) | (data[1] << 8)) & 0xFFFF;
+      int red   = ((data[2] & 0xFF) | (data[3] << 8)) & 0xFFFF;
+      int green = ((data[4] & 0xFF) | (data[5] << 8)) & 0xFFFF;
+      int blue  = ((data[6] & 0xFF) | (data[7] << 8)) & 0xFFFF;
       listener.onColourUpdated(clear, red, green, blue);
     }
   }

@@ -137,6 +137,8 @@ public class ColourSensor {
 
   public void enable(boolean enable) {
     if (tcs34725 != null) {
+      tcs34725.setGain(Tcs34725.GAIN_16);
+      tcs34725.setIntegrationTime(5f);
       tcs34725.enable(enable);
       enableLed(enable);
     }
