@@ -16,27 +16,29 @@
 package nz.geek.android.things.drivers.colour;
 
 public class Colour {
-  private static final int RED_INDEX = 0;
-  private static final int GREEN_INDEX = 1;
-  private static final int BLUE_INDEX = 2;
-  private static final int CLEAR_INDEX = 4;
-  private final int[] raw;
-
-  public Colour(int[] raw) {
-    this.raw = raw;
-  }
+  public final int red;
+  public final int green;
+  public final int blue;
+  public final int clear;
 
   public Colour(int red, int green, int blue, int clear) {
-    raw = new int[]{red, green, blue, clear};
+    this.red = red;
+    this.green = green;
+    this.blue = blue;
+    this.clear = clear;
   }
 
-  public int[] getRaw() {
-    return raw;
-  }
-
-  public int getRedRaw() {
-    if (raw.length == 0) return 0;
-    return raw[RED_INDEX];
+  /**
+   * Create a {@link Colour} from the given byte array
+   * @param data [CL, CH, RL, RH, GL, GR, BL, BH]
+   * @return new {@link Colour}
+   */
+  public static Colour fromByteArray(byte[] data) {
+    int clear = ((data[0] & 0xFF) | (data[1] << 8)) & 0xFFFF;
+    int red   = ((data[2] & 0xFF) | (data[3] << 8)) & 0xFFFF;
+    int green = ((data[4] & 0xFF) | (data[5] << 8)) & 0xFFFF;
+    int blue  = ((data[6] & 0xFF) | (data[7] << 8)) & 0xFFFF;
+    return new Colour(red, green, blue, clear);
   }
 
   /**
@@ -50,8 +52,8 @@ public class Colour {
     return (int) ((-0.32466f * (float) red) + (1.57837f * (float) green) + (-0.73191f * (float) blue));
   }
 
-  private int toLux(int[] raw) {
-    return toLux(raw[RED_INDEX], raw[GREEN_INDEX], raw[BLUE_INDEX]);
+  public int toLux() {
+    return toLux(red, green, blue);
   }
 
   /**
@@ -78,8 +80,7 @@ public class Colour {
     return (int) ((449.0F * Math.pow(n, 3)) + (3525.0F * Math.pow(n, 2)) + (6823.3F * n) + 5520.33F);
   }
 
-  private int toColourTemperature(int[] raw) {
-    if (raw == null || raw.length < 3) return -1;
-    return toColourTemperature(raw[RED_INDEX], raw[GREEN_INDEX], raw[BLUE_INDEX]);
+  public int toColourTemperature() {
+    return toColourTemperature(red, green, blue);
   }
 }

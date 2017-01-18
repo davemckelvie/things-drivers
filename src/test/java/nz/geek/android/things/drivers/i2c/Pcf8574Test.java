@@ -25,7 +25,7 @@ public class Pcf8574Test {
 
   @Before
   public void before() {
-    pcf8574 = new Pcf8574(device, 7);
+    pcf8574 = new Pcf8574(device);
   }
 
   @Test

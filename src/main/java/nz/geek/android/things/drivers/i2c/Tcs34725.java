@@ -15,38 +15,44 @@
  */
 package nz.geek.android.things.drivers.i2c;
 
+import android.hardware.Sensor;
 import android.os.Handler;
 import android.os.HandlerThread;
 
 import com.google.android.things.pio.I2cDevice;
 import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.userdriver.UserDriverManager;
+import com.google.android.things.userdriver.UserSensor;
+import com.google.android.things.userdriver.UserSensorDriver;
+import com.google.android.things.userdriver.UserSensorReading;
 
 import java.io.IOException;
 
+import nz.geek.android.things.drivers.colour.Colour;
 import nz.geek.android.things.drivers.colour.ColourSensor;
 
 public class Tcs34725 extends BaseI2cDevice implements Runnable {
   private static final String TAG = Tcs34725.class.getSimpleName();
 
-  private static final int BASE_ADDRESS = 0x29;
+  private static final int DEVICE_ADDRESS = 0x29;
 
-  private static final int UPDATE_PERIOD = 2000;
+  private static final int UPDATE_PERIOD = 200;
 
   /* TCS34725 Registers */
   private static final int COMMAND = 0x80;  //   −− COMMAND W Specifies register address 0x00
-  private static final int ENABLE = (COMMAND | 0x00);   // 0x00 ENABLE R/W Enables states and interrupts 0x00
-  private static final int ATIME = (COMMAND | 0x01);    // 0x01 ATIME R/W RGBC time 0xFF
-  private static final int WTIME = (COMMAND | 0x03);    // 0x03 WTIME R/W Wait time 0xFF
-  private static final int AILTL = (COMMAND | 0x04);    // 0x04 AILTL R/W Clear interrupt low threshold low byte 0x00
+  /* package */ static final int ENABLE = (COMMAND | 0x00);   // 0x00 ENABLE R/W Enables states and interrupts 0x00
+  /* package */ static final int ATIME = (COMMAND | 0x01);    // 0x01 ATIME R/W RGBC time 0xFF
+  /* package */ static final int WTIME = (COMMAND | 0x03);    // 0x03 WTIME R/W Wait time 0xFF
+  /* package */ static final int AILTL = (COMMAND | 0x04);    // 0x04 AILTL R/W Clear interrupt low threshold low byte 0x00
   private static final int AILTH = (COMMAND | 0x05);    // 0x05 AILTH R/W Clear interrupt low threshold high byte 0x00
   private static final int AIHTL = (COMMAND | 0x06);    // 0x06 AIHTL R/W Clear interrupt high threshold low byte 0x00
   private static final int AIHTH = (COMMAND | 0x07);    // 0x07 AIHTH R/W Clear interrupt high threshold high byte 0x00
-  private static final int PERS = (COMMAND | 0x0C);     // 0x0C PERS R/W Interrupt persistence filter 0x00
-  private static final int CONFIG = (COMMAND | 0x0D);   // 0x0D CONFIG R/W Configuration 0x00
-  private static final int CONTROL = (COMMAND | 0x0F);  // 0x0F CONTROL R/W Control 0x00
-  private static final int ID = (COMMAND | 0x12);       // 0x12 ID R Device ID ID
-  private static final int STATUS = (COMMAND | 0x13);   // 0x13 STATUS R Device status 0x00
-  private static final int CDATAL = (COMMAND | 0x14);   // 0x14 CDATAL R Clear data low byte 0x00
+  /* package */ static final int PERS = (COMMAND | 0x0C);     // 0x0C PERS R/W Interrupt persistence filter 0x00
+  /* package */ static final int CONFIG = (COMMAND | 0x0D);   // 0x0D CONFIG R/W Configuration 0x00
+  /* package */ static final int CONTROL = (COMMAND | 0x0F);  // 0x0F CONTROL R/W Control 0x00
+  /* package */ static final int ID = (COMMAND | 0x12);       // 0x12 ID R Device ID ID
+  /* package */ static final int STATUS = (COMMAND | 0x13);   // 0x13 STATUS R Device status 0x00
+  /* package */ static final int CDATAL = (COMMAND | 0x14);   // 0x14 CDATAL R Clear data low byte 0x00
   private static final int CDATAH = (COMMAND | 0x15);   // 0x15 CDATAH R Clear data high byte 0x00
   private static final int RDATAL = (COMMAND | 0x16);   // 0x16 RDATAL R Red data low byte 0x00
   private static final int RDATAH = (COMMAND | 0x17);   // 0x17 RDATAH R Red data high byte 0x00
@@ -57,14 +63,14 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   /* COMMAND register values */
   private static final int BYTE_PROTOCOL = 0x00;    // Byte protocol will repeatedly read the same register with each data access.
-  private static final int BLOCK_PROTOCOL = 0x40;   // Block protocol will provide auto-increment function to read successive bytes.
+  /* package */ static final int BLOCK_PROTOCOL = 0x40;   // Block protocol will provide auto-increment function to read successive bytes.
   private static final int CLEAR_INTERRUPT = 0x66;  // Clear channel interrupt clear
 
   /* ENABLE register values */
-  private static final int AIEN = 0x10; // RGBC interrupt enable. When asserted, permits RGBC interrupts to be generated.
-  private static final int WEN = 0x08;  // Wait enable. Writing a 1 activates the wait timer. Writing a 0 disables the wait timer.
-  private static final int AEN = 0x02;  // RGBC enable. Writing a 1 activates the RGBC. Writing a 0 disables the RGBC.
-  private static final int PON = 0x01;  // Power ON. This bit activates the internal oscillator to permit the timers and ADC channels to operate.
+  /* package */ static final int AIEN = 0x10; // RGBC interrupt enable. When asserted, permits RGBC interrupts to be generated.
+  /* package */ static final int WEN = 0x08;  // Wait enable. Writing a 1 activates the wait timer. Writing a 0 disables the wait timer.
+  /* package */ static final int AEN = 0x02;  // RGBC enable. Writing a 1 activates the RGBC. Writing a 0 disables the RGBC.
+  /* package */ static final int PON = 0x01;  // Power ON. This bit activates the internal oscillator to permit the timers and ADC channels to operate.
                                         // Writing a 1 activates the oscillator. Writing a 0 disables the oscillator.
 
   /* CONFIG register values */
@@ -72,10 +78,10 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
                                           // WTIME register
   
   /* CONTROL register values */
-  private static final int GAIN_1 = 0x00;
-  private static final int GAIN_4 = 0x01;
-  private static final int GAIN_16 = 0x02;
-  private static final int GAIN_60 = 0x03;
+  public static final int GAIN_1 = 0x00;
+  public static final int GAIN_4 = 0x01;
+  public static final int GAIN_16 = 0x02;
+  public static final int GAIN_60 = 0x03;
 
   /* STATUS register values */
   private static final int AINT = 0x10;   // RGBC clear channel Interrupt.
@@ -84,9 +90,28 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   private ColourSensor.Listener listener;
   private HandlerThread handlerThread;
   private Handler handler;
+  private UserSensor luxSensor;
+  private LuxSensorDriver luxSensorDriver;
 
-  /* package */ Tcs34725(I2cDevice device, int address) {
-    super(device, address);
+  private class LuxSensorDriver extends UserSensorDriver {
+
+    private float lux = 0.0f;
+    public void setLux(float lux) {
+      this.lux = lux;
+    }
+
+    @Override
+    public UserSensorReading read() throws IOException {
+      return new UserSensorReading(new float[]{lux});
+    }
+  }
+
+  /* package */ Tcs34725(I2cDevice device) {
+    super(device);
+  }
+
+  private void init() {
+    luxSensorDriver = new LuxSensorDriver();
     initHandler();
   }
 
@@ -115,13 +140,13 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
    * @return newly created {@link Tcs34725}
    */
   public static Tcs34725 create(String bus) {
-    int fullAddress = BASE_ADDRESS;
-    I2cDevice device = getDevice(bus, fullAddress);
-    return new Tcs34725(device, fullAddress);
+    Tcs34725 tcs34725 = new Tcs34725(getDevice(bus, DEVICE_ADDRESS));
+    tcs34725.init();
+    return tcs34725;
   }
 
   /**
-   * Close sensor and tidy up treads. After a call to {@link #close()} the {@link Tcs34725} is invalid
+   * Close sensor and tidy up treads. After a call to this method the {@link Tcs34725} is invalid
    * and should not be used.
    */
   public void close() {
@@ -134,6 +159,11 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
       handlerThread.quitSafely();
       handlerThread = null;
     }
+    if (luxSensor != null) {
+      UserDriverManager manager = UserDriverManager.getManager();
+      manager.unregisterSensor(luxSensor);
+      luxSensor = null;
+    }
   }
 
   public void setListener(ColourSensor.Listener listener) {
@@ -141,7 +171,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   public void setGain(int gain) {
-    if (gain > 0 && gain < 4) {
+    if (gain >= GAIN_1 && gain <= GAIN_60) {
       writeRegister(CONTROL, gain);
     }
   }
@@ -160,7 +190,8 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   public void setInterruptThresholds(int lower, int upper) {
-    byte[] buffer = new byte[]{(byte) (lower & 0xFF), (byte) (lower >> 4), (byte) (upper & 0xFF), (byte) (upper >> 4)};
+    byte[] buffer = new byte[]{(byte) (lower & 0xFF), (byte) ((lower >> 8) & 0xFF),
+            (byte) (upper & 0xFF), (byte) ((upper >> 8) & 0xFF)};
     try {
       device.writeRegBuffer((BLOCK_PROTOCOL | AILTL), buffer, buffer.length);
     } catch (IOException e) {
@@ -169,26 +200,30 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   /**
+   * <pre>
+   * value  number of out of range readings causing interrupt
+   * --------------------------------------------------------
+   * 0      Every RGBC cycle generates an interrupt
+   * 1      1
+   * 2      2
+   * 3      3
+   * 4      5
+   * 5      10
+   * 6      15
+   * 7      20
+   * 8      25
+   * 9      30
+   * 10     35
+   * 11     40
+   * 12     45
+   * 13     50
+   * 14     55
+   * 15     60
+   * </pre>
    * @param persistence [0:15]
-   * 0000 Every RGBC cycle generates an interrupt
-   * 0001 1 clear channel value outside of threshold range
-   * 0010 2 clear channel consecutive values out of range
-   * 0011 3 clear channel consecutive values out of range
-   * 0100 5 clear channel consecutive values out of range
-   * 0101 10 clear channel consecutive values out of range
-   * 0110 15 clear channel consecutive values out of range
-   * 0111 20 clear channel consecutive values out of range
-   * 1000 25 clear channel consecutive values out of range
-   * 1001 30 clear channel consecutive values out of range
-   * 1010 35 clear channel consecutive values out of range
-   * 1011 40 clear channel consecutive values out of range
-   * 1100 45 clear channel consecutive values out of range
-   * 1101 50 clear channel consecutive values out of range
-   * 1110 55 clear channel consecutive values out of range
-   * 1111 60 clear channel consecutive values out of range
    */
   public void setInterruptPersistence(int persistence) {
-    if (persistence > 0 && persistence < 16) {
+    if (persistence >= 0 && persistence < 16) {
       writeRegister(PERS, persistence);
     }
   }
@@ -207,6 +242,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   public void enable(boolean enable) {
     initHandler();
+
     int enableRegister = readRegister(ENABLE);
     int en = enable ? (enableRegister | PON | AEN) : (enableRegister & ~(PON | AEN));
     writeRegister(ENABLE, en);
@@ -223,6 +259,21 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   public int readId() {
     return readRegister(ID);
+  }
+
+  public void registerSensorDriver() {
+    UserDriverManager manager = UserDriverManager.getManager();
+    luxSensor = getUserSensor();
+    manager.registerSensor(luxSensor);
+  }
+
+  public UserSensor getUserSensor() {
+    return UserSensor.builder()
+            .setName("tcs3472")
+            .setVendor("TAOS")
+            .setType(Sensor.TYPE_LIGHT)
+            .setDriver(luxSensorDriver)
+            .build();
   }
 
   private int readRegister(int reg) {
@@ -242,29 +293,33 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
     }
   }
 
-  private void readColour() {
+  private Colour readColour() {
     try {
       byte[] buffer = new byte[8];
       device.readRegBuffer((BLOCK_PROTOCOL | CDATAL), buffer, buffer.length);
-      notifyListener(buffer);
+      return Colour.fromByteArray(buffer);
     } catch (IOException e) {
-      //
+      return null;
     }
   }
 
-  private void notifyListener(byte[] data) {
-    if (listener != null && data.length >= 8) {
-      int clear = (data[0] & 0xFF) | (data[1] << 8);
-      int red   = (data[2] & 0xFF) | (data[3] << 8);
-      int green = (data[4] & 0xFF) | (data[5] << 8);
-      int blue  = (data[6] & 0xFF) | (data[7] << 8);
-      listener.onColourUpdated(clear, red, green, blue);
+  private void updateLuxDriver(Colour colour) {
+      if (luxSensorDriver != null && colour != null) {
+        luxSensorDriver.setLux(colour.toLux());
+      }
+  }
+
+  private void notifyListener(Colour colour) {
+    if (listener != null && colour != null) {
+      listener.onColourUpdated(colour.clear, colour.red, colour.green, colour.blue);
     }
   }
 
   @Override
   public void run() {
-    readColour();
+    Colour colour = readColour();
+    updateLuxDriver(colour);
+    notifyListener(colour);
     handler.postDelayed(this, UPDATE_PERIOD);
   }
 }

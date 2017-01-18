@@ -48,10 +48,9 @@ public class Pcf8591 extends BaseI2cDevice {
   /**
    * Constructor given I2cDevice for testing with mock device
    * @param device I2cDevice of the ADC
-   * @param address base address + value of A0-A2 for your board
    */
-  /* package */ Pcf8591(I2cDevice device, int address) {
-    super(device, address);
+  /* package */ Pcf8591(I2cDevice device) {
+    super(device);
   }
 
   /**
@@ -73,8 +72,7 @@ public class Pcf8591 extends BaseI2cDevice {
    */
   public static Pcf8591 create(int address, String bus) {
     int fullAddress = BASE_ADDRESS + address;
-    I2cDevice device = getDevice(bus, fullAddress);
-    return new Pcf8591(device, fullAddress);
+    return new Pcf8591(getDevice(bus, fullAddress));
   }
 
   public void close() {

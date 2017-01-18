@@ -35,7 +35,7 @@ TCS34725 I2C Colour sensor
 ## How to use
 
 1. Create an Android Things project as described [here](https://developer.android.com/things/training/first-device/create-studio-project.html)
-2. Add the following to your project's `build.gradle` replace <version> with [latest version](https://bintray.com/davemckelvie/maven/things-drivers/_latestVersion)
+2. Add the following to your project's `build.gradle` replace `version` with [latest version](https://bintray.com/davemckelvie/maven/things-drivers/_latestVersion)
 ```
 dependencies {
     compile 'nz.geek.android.things:things-drivers:<version>'

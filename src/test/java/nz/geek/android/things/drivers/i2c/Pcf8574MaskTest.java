@@ -44,7 +44,7 @@ public class Pcf8574MaskTest {
   @Test
   public void testMask() throws Exception {
     I2cDevice mockDevice = mock(I2cDevice.class);
-    Pcf8574 pcf8574 = new Pcf8574(mockDevice, 7);
+    Pcf8574 pcf8574 = new Pcf8574(mockDevice);
     assertTrue(pcf8574.writeByte(inputMask, inputData));
     verify(mockDevice).write(new byte[]{(byte)(expectedResult & 0xFF)}, 1);
   }

@@ -67,6 +67,7 @@ public class ColourSensor {
       tcs34725 = Tcs34725.create();
     }
     tcs34725.setListener(listener);
+    tcs34725.registerSensorDriver();
   }
 
   /**
@@ -137,6 +138,8 @@ public class ColourSensor {
 
   public void enable(boolean enable) {
     if (tcs34725 != null) {
+      tcs34725.setGain(Tcs34725.GAIN_16);
+      tcs34725.setIntegrationTime(5f);
       tcs34725.enable(enable);
       enableLed(enable);
     }

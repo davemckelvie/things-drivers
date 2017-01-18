@@ -26,11 +26,9 @@ import java.util.List;
 public abstract class BaseI2cDevice {
 
   protected final I2cDevice device;
-  protected final int address;
 
-  protected BaseI2cDevice(I2cDevice device, int address) {
+  protected BaseI2cDevice(I2cDevice device) {
     this.device = device;
-    this.address = address;
   }
 
   protected static String getBus() {

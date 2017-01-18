@@ -174,7 +174,7 @@ public class I2cSerialCharLcd implements Lcd {
    * @param message the message to write
    */
   @Override
-  public void print(int line, String message) {
+  public synchronized void print(int line, String message) {
 
     // support displays with more than 80 characters (will have 2 enable pins)
     if (isDoubleDisplay() && line > 2) {
