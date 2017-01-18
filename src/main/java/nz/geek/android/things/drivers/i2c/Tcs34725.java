@@ -34,7 +34,7 @@ import nz.geek.android.things.drivers.colour.ColourSensor;
 public class Tcs34725 extends BaseI2cDevice implements Runnable {
   private static final String TAG = Tcs34725.class.getSimpleName();
 
-  private static final int BASE_ADDRESS = 0x29;
+  private static final int DEVICE_ADDRESS = 0x29;
 
   private static final int UPDATE_PERIOD = 200;
 
@@ -114,6 +114,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
     luxSensorDriver = new LuxSensorDriver();
     initHandler();
   }
+
   private void initHandler() {
     if (handlerThread == null) {
       handlerThread = new HandlerThread(TAG);
@@ -139,7 +140,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
    * @return newly created {@link Tcs34725}
    */
   public static Tcs34725 create(String bus) {
-    Tcs34725 tcs34725 = new Tcs34725(getDevice(bus, BASE_ADDRESS));
+    Tcs34725 tcs34725 = new Tcs34725(getDevice(bus, DEVICE_ADDRESS));
     tcs34725.init();
     return tcs34725;
   }

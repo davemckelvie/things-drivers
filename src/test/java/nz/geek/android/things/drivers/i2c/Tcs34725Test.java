@@ -132,5 +132,4 @@ public class Tcs34725Test {
     tcs34725.readId();
     verify(device).readRegByte(ID);
   }
-
 }
