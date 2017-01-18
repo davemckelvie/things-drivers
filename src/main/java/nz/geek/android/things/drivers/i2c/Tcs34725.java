@@ -15,14 +15,20 @@
  */
 package nz.geek.android.things.drivers.i2c;
 
+import android.hardware.Sensor;
 import android.os.Handler;
 import android.os.HandlerThread;
 
 import com.google.android.things.pio.I2cDevice;
 import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.userdriver.UserDriverManager;
+import com.google.android.things.userdriver.UserSensor;
+import com.google.android.things.userdriver.UserSensorDriver;
+import com.google.android.things.userdriver.UserSensorReading;
 
 import java.io.IOException;
 
+import nz.geek.android.things.drivers.colour.Colour;
 import nz.geek.android.things.drivers.colour.ColourSensor;
 
 public class Tcs34725 extends BaseI2cDevice implements Runnable {
@@ -84,6 +90,21 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   private ColourSensor.Listener listener;
   private HandlerThread handlerThread;
   private Handler handler;
+  private UserSensor luxSensor;
+  private LuxSensorDriver luxSensorDriver = new LuxSensorDriver();
+
+  private class LuxSensorDriver extends UserSensorDriver {
+
+    private float lux = 0.0f;
+    public void setLux(float lux) {
+      this.lux = lux;
+    }
+
+    @Override
+    public UserSensorReading read() throws IOException {
+      return new UserSensorReading(new float[]{lux});
+    }
+  }
 
   /* package */ Tcs34725(I2cDevice device, int address) {
     super(device, address);
@@ -121,7 +142,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   /**
-   * Close sensor and tidy up treads. After a call to {@link #close()} the {@link Tcs34725} is invalid
+   * Close sensor and tidy up treads. After a call to this method the {@link Tcs34725} is invalid
    * and should not be used.
    */
   public void close() {
@@ -133,6 +154,11 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
     if (handlerThread != null) {
       handlerThread.quitSafely();
       handlerThread = null;
+    }
+    if (luxSensor != null) {
+      UserDriverManager manager = UserDriverManager.getManager();
+      manager.unregisterSensor(luxSensor);
+      luxSensor = null;
     }
   }
 
@@ -170,22 +196,24 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   /**
    * <pre>
-   * 0 Every RGBC cycle generates an interrupt
-   * 1 1 clear channel value outside of threshold range
-   * 2 2 clear channel consecutive values out of range
-   * 3 3 clear channel consecutive values out of range
-   * 4 5 clear channel consecutive values out of range
-   * 5 10 clear channel consecutive values out of range
-   * 6 15 clear channel consecutive values out of range
-   * 7 20 clear channel consecutive values out of range
-   * 8 25 clear channel consecutive values out of range
-   * 9 30 clear channel consecutive values out of range
-   * 10 35 clear channel consecutive values out of range
-   * 11 40 clear channel consecutive values out of range
-   * 12 45 clear channel consecutive values out of range
-   * 13 50 clear channel consecutive values out of range
-   * 14 55 clear channel consecutive values out of range
-   * 15 60 clear channel consecutive values out of range
+   * value  number of out of range readings causing interrupt
+   * --------------------------------------------------------
+   * 0      Every RGBC cycle generates an interrupt
+   * 1      1
+   * 2      2
+   * 3      3
+   * 4      5
+   * 5      10
+   * 6      15
+   * 7      20
+   * 8      25
+   * 9      30
+   * 10     35
+   * 11     40
+   * 12     45
+   * 13     50
+   * 14     55
+   * 15     60
    * </pre>
    * @param persistence [0:15]
    */
@@ -228,6 +256,21 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
     return readRegister(ID);
   }
 
+  public void registerSensorDriver() {
+    UserDriverManager manager = UserDriverManager.getManager();
+    luxSensor = getUserSensor();
+    manager.registerSensor(luxSensor);
+  }
+
+  public UserSensor getUserSensor() {
+    return UserSensor.builder()
+            .setName("tcs3472")
+            .setVendor("TAOS")
+            .setType(Sensor.TYPE_LIGHT)
+            .setDriver(luxSensorDriver)
+            .build();
+  }
+
   private int readRegister(int reg) {
     try {
       return device.readRegByte(reg);
@@ -245,29 +288,33 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
     }
   }
 
-  private void readColour() {
+  private Colour readColour() {
     try {
       byte[] buffer = new byte[8];
       device.readRegBuffer((BLOCK_PROTOCOL | CDATAL), buffer, buffer.length);
-      notifyListener(buffer);
+      return Colour.fromByteArray(buffer);
     } catch (IOException e) {
-      //
+      return null;
     }
   }
 
-  private void notifyListener(byte[] data) {
-    if (listener != null && data.length >= 8) {
-      int clear = ((data[0] & 0xFF) | (data[1] << 8)) & 0xFFFF;
-      int red   = ((data[2] & 0xFF) | (data[3] << 8)) & 0xFFFF;
-      int green = ((data[4] & 0xFF) | (data[5] << 8)) & 0xFFFF;
-      int blue  = ((data[6] & 0xFF) | (data[7] << 8)) & 0xFFFF;
-      listener.onColourUpdated(clear, red, green, blue);
+  private void updateLuxDriver(Colour colour) {
+      if (luxSensorDriver != null && colour != null) {
+        luxSensorDriver.setLux(colour.toLux());
+      }
+  }
+
+  private void notifyListener(Colour colour) {
+    if (listener != null && colour != null) {
+      listener.onColourUpdated(colour.clear, colour.red, colour.green, colour.blue);
     }
   }
 
   @Override
   public void run() {
-    readColour();
+    Colour colour = readColour();
+    updateLuxDriver(colour);
+    notifyListener(colour);
     handler.postDelayed(this, UPDATE_PERIOD);
   }
 }

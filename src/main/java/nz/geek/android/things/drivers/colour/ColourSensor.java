@@ -67,6 +67,7 @@ public class ColourSensor {
       tcs34725 = Tcs34725.create();
     }
     tcs34725.setListener(listener);
+    tcs34725.registerSensorDriver();
   }
 
   /**
