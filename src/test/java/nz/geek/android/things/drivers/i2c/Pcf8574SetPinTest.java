@@ -53,7 +53,7 @@ public class Pcf8574SetPinTest {
   @Test
   public void testSetPin() throws Exception{
     I2cDevice mockDevice = mock(I2cDevice.class);
-    Pcf8574 pcf8574 = new Pcf8574(mockDevice, 7);
+    Pcf8574 pcf8574 = new Pcf8574(mockDevice);
     pcf8574.setPin(pin, state);
     verify(mockDevice).write(new byte[]{(byte) expectedData}, 1);
     assertEquals(expectedData, pcf8574.readValue());

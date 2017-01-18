@@ -40,19 +40,19 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   /* TCS34725 Registers */
   private static final int COMMAND = 0x80;  //   −− COMMAND W Specifies register address 0x00
-  private static final int ENABLE = (COMMAND | 0x00);   // 0x00 ENABLE R/W Enables states and interrupts 0x00
-  private static final int ATIME = (COMMAND | 0x01);    // 0x01 ATIME R/W RGBC time 0xFF
-  private static final int WTIME = (COMMAND | 0x03);    // 0x03 WTIME R/W Wait time 0xFF
-  private static final int AILTL = (COMMAND | 0x04);    // 0x04 AILTL R/W Clear interrupt low threshold low byte 0x00
+  /* package */ static final int ENABLE = (COMMAND | 0x00);   // 0x00 ENABLE R/W Enables states and interrupts 0x00
+  /* package */ static final int ATIME = (COMMAND | 0x01);    // 0x01 ATIME R/W RGBC time 0xFF
+  /* package */ static final int WTIME = (COMMAND | 0x03);    // 0x03 WTIME R/W Wait time 0xFF
+  /* package */ static final int AILTL = (COMMAND | 0x04);    // 0x04 AILTL R/W Clear interrupt low threshold low byte 0x00
   private static final int AILTH = (COMMAND | 0x05);    // 0x05 AILTH R/W Clear interrupt low threshold high byte 0x00
   private static final int AIHTL = (COMMAND | 0x06);    // 0x06 AIHTL R/W Clear interrupt high threshold low byte 0x00
   private static final int AIHTH = (COMMAND | 0x07);    // 0x07 AIHTH R/W Clear interrupt high threshold high byte 0x00
-  private static final int PERS = (COMMAND | 0x0C);     // 0x0C PERS R/W Interrupt persistence filter 0x00
-  private static final int CONFIG = (COMMAND | 0x0D);   // 0x0D CONFIG R/W Configuration 0x00
-  private static final int CONTROL = (COMMAND | 0x0F);  // 0x0F CONTROL R/W Control 0x00
-  private static final int ID = (COMMAND | 0x12);       // 0x12 ID R Device ID ID
-  private static final int STATUS = (COMMAND | 0x13);   // 0x13 STATUS R Device status 0x00
-  private static final int CDATAL = (COMMAND | 0x14);   // 0x14 CDATAL R Clear data low byte 0x00
+  /* package */ static final int PERS = (COMMAND | 0x0C);     // 0x0C PERS R/W Interrupt persistence filter 0x00
+  /* package */ static final int CONFIG = (COMMAND | 0x0D);   // 0x0D CONFIG R/W Configuration 0x00
+  /* package */ static final int CONTROL = (COMMAND | 0x0F);  // 0x0F CONTROL R/W Control 0x00
+  /* package */ static final int ID = (COMMAND | 0x12);       // 0x12 ID R Device ID ID
+  /* package */ static final int STATUS = (COMMAND | 0x13);   // 0x13 STATUS R Device status 0x00
+  /* package */ static final int CDATAL = (COMMAND | 0x14);   // 0x14 CDATAL R Clear data low byte 0x00
   private static final int CDATAH = (COMMAND | 0x15);   // 0x15 CDATAH R Clear data high byte 0x00
   private static final int RDATAL = (COMMAND | 0x16);   // 0x16 RDATAL R Red data low byte 0x00
   private static final int RDATAH = (COMMAND | 0x17);   // 0x17 RDATAH R Red data high byte 0x00
@@ -63,14 +63,14 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
 
   /* COMMAND register values */
   private static final int BYTE_PROTOCOL = 0x00;    // Byte protocol will repeatedly read the same register with each data access.
-  private static final int BLOCK_PROTOCOL = 0x40;   // Block protocol will provide auto-increment function to read successive bytes.
+  /* package */ static final int BLOCK_PROTOCOL = 0x40;   // Block protocol will provide auto-increment function to read successive bytes.
   private static final int CLEAR_INTERRUPT = 0x66;  // Clear channel interrupt clear
 
   /* ENABLE register values */
-  private static final int AIEN = 0x10; // RGBC interrupt enable. When asserted, permits RGBC interrupts to be generated.
-  private static final int WEN = 0x08;  // Wait enable. Writing a 1 activates the wait timer. Writing a 0 disables the wait timer.
-  private static final int AEN = 0x02;  // RGBC enable. Writing a 1 activates the RGBC. Writing a 0 disables the RGBC.
-  private static final int PON = 0x01;  // Power ON. This bit activates the internal oscillator to permit the timers and ADC channels to operate.
+  /* package */ static final int AIEN = 0x10; // RGBC interrupt enable. When asserted, permits RGBC interrupts to be generated.
+  /* package */ static final int WEN = 0x08;  // Wait enable. Writing a 1 activates the wait timer. Writing a 0 disables the wait timer.
+  /* package */ static final int AEN = 0x02;  // RGBC enable. Writing a 1 activates the RGBC. Writing a 0 disables the RGBC.
+  /* package */ static final int PON = 0x01;  // Power ON. This bit activates the internal oscillator to permit the timers and ADC channels to operate.
                                         // Writing a 1 activates the oscillator. Writing a 0 disables the oscillator.
 
   /* CONFIG register values */
@@ -91,7 +91,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   private HandlerThread handlerThread;
   private Handler handler;
   private UserSensor luxSensor;
-  private LuxSensorDriver luxSensorDriver = new LuxSensorDriver();
+  private LuxSensorDriver luxSensorDriver;
 
   private class LuxSensorDriver extends UserSensorDriver {
 
@@ -106,11 +106,14 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
     }
   }
 
-  /* package */ Tcs34725(I2cDevice device, int address) {
-    super(device, address);
-    initHandler();
+  /* package */ Tcs34725(I2cDevice device) {
+    super(device);
   }
 
+  private void init() {
+    luxSensorDriver = new LuxSensorDriver();
+    initHandler();
+  }
   private void initHandler() {
     if (handlerThread == null) {
       handlerThread = new HandlerThread(TAG);
@@ -136,9 +139,9 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
    * @return newly created {@link Tcs34725}
    */
   public static Tcs34725 create(String bus) {
-    int fullAddress = BASE_ADDRESS;
-    I2cDevice device = getDevice(bus, fullAddress);
-    return new Tcs34725(device, fullAddress);
+    Tcs34725 tcs34725 = new Tcs34725(getDevice(bus, BASE_ADDRESS));
+    tcs34725.init();
+    return tcs34725;
   }
 
   /**
@@ -167,7 +170,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   public void setGain(int gain) {
-    if (gain > 0 && gain < 4) {
+    if (gain >= GAIN_1 && gain <= GAIN_60) {
       writeRegister(CONTROL, gain);
     }
   }
@@ -186,7 +189,8 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   public void setInterruptThresholds(int lower, int upper) {
-    byte[] buffer = new byte[]{(byte) (lower & 0xFF), (byte) (lower >> 4), (byte) (upper & 0xFF), (byte) (upper >> 4)};
+    byte[] buffer = new byte[]{(byte) (lower & 0xFF), (byte) ((lower >> 8) & 0xFF),
+            (byte) (upper & 0xFF), (byte) ((upper >> 8) & 0xFF)};
     try {
       device.writeRegBuffer((BLOCK_PROTOCOL | AILTL), buffer, buffer.length);
     } catch (IOException e) {
