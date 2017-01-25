@@ -88,4 +88,10 @@ public class Pcf8574Test {
     pcf8574.readByte();
     verify(device).read(any(byte[].class), eq(1));
   }
+
+  @Test
+  public void testGetPin() throws IOException {
+    pcf8574.getPin(1);
+    verify(device).read(any(byte[].class), eq(1));
+  }
 }

@@ -1,3 +1,7 @@
+## 1.2.4 (2017-01-25)
+
+  - add getPin() and readByte() to pcf8574
+
 ## 1.2.3 (2017-01-18)
 
   - add lux user sensor driver using TCS34725
