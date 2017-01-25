@@ -29,9 +29,8 @@ public interface IoPort {
   boolean writeByte(int mask, int data);
 
   /**
-   * Read the current state of the port. The LSB of the returned int will be
-   * the value last written to the port.
-   * @return
+   * Read the last value written to the port.
+   * @return last value written to the port (LSB is value)
    */
   int readValue();
 
@@ -41,6 +40,19 @@ public interface IoPort {
    * @param state true to set it, false to clear it
    */
   void setPin(int pin, boolean state);
+
+  /**
+   * Get the state of the given port pin
+   * @param pin the pin to get [0:7]
+   * @return true when set (logic 1), false when clear (logic 0)
+   */
+  boolean getPin(int pin);
+
+  /**
+   * Read the port data, the state of all pins.
+   * @return the byte read from the port (as an int LSB is port data)
+   */
+  int readByte();
 
   /**
    * Close the port. The port is invalid after being closed.

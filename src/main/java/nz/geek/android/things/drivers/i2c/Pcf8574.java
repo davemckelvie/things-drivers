@@ -113,10 +113,6 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
     }
   }
 
-  /**
-   * Read the last value written to the port
-   * @return currentValue
-   */
   @Override
   public int readValue() {
     return (currentValue & 0xFF);
@@ -124,10 +120,17 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
 
   @Override
   public void setPin(int pin, boolean state) {
-    if (pin > 7) return;
+    if (pin < 0 || pin > 7) return;
     int mask = ~BV(pin);
     int data = state ? BV(pin) : 0;
     writeByte(mask, data & 0xFF);
+  }
+
+  @Override
+  public boolean getPin(int pin) {
+    if (pin < 0 || pin > 7) return false;
+    int value = readByte();
+    return ((value & BV(pin)) == BV(pin));
   }
 
   @Override
@@ -135,11 +138,7 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
     super.close();
   }
 
-  /**
-   * read the port. This may not do what you want because it's 'quasi-bidirectional.'
-   * Read the data sheet, it explains it much better.
-   * @return
-   */
+  @Override
   public int readByte() {
     if (device == null) return 0;
 
