@@ -17,11 +17,12 @@ package nz.geek.android.things.drivers.lcd;
 
 import com.google.android.things.pio.PeripheralManagerService;
 
+import nz.geek.android.things.drivers.display.CharacterDisplay;
 import nz.geek.android.things.drivers.i2c.Pcf8574;
 
 import static nz.geek.android.things.drivers.i2c.Pcf8574.BV;
 
-public class I2cSerialCharLcd implements Lcd {
+public class I2cSerialCharLcd implements CharacterDisplay {
   
   private static final int SPACE = 0x20;
 
@@ -288,6 +289,11 @@ public class I2cSerialCharLcd implements Lcd {
     }
   }
 
+  @Override
+  public boolean hasBackLight() {
+    return hasBackLight;
+  }
+
   private void setCgRamPattern(int address, byte[] pattern) {
     writeCommand(LCD_SET_CG_RAM | address);   // set CGRAM address
     for (byte aPattern : pattern) {
@@ -296,7 +302,7 @@ public class I2cSerialCharLcd implements Lcd {
   }
 
   @Override
-  public void setCgRam(int address, byte[] pattern) {
+  public void setCustomCharacter(int address, byte[] pattern) {
     setCgRamPattern(address, pattern);
     if (isDoubleDisplay()) {
       switchDisplay(2);
@@ -330,12 +336,12 @@ public class I2cSerialCharLcd implements Lcd {
 
   @Override
   public void initBarGraph() {
-    setCgRam(0x00, new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
-    setCgRam(0x08, new byte[]{0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00});
-    setCgRam(0x10, new byte[]{0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x00});
-    setCgRam(0x18, new byte[]{0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x00});
-    setCgRam(0x20, new byte[]{0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x00});
-    setCgRam(0x28, new byte[]{0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x00});
+    setCustomCharacter(0x00, new byte[]{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+    setCustomCharacter(0x08, new byte[]{0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00});
+    setCustomCharacter(0x10, new byte[]{0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x00});
+    setCustomCharacter(0x18, new byte[]{0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x1C, 0x00});
+    setCustomCharacter(0x20, new byte[]{0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x1E, 0x00});
+    setCustomCharacter(0x28, new byte[]{0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x00});
   }
 
   public static I2cSerialCharLcdBuilder builder(int width, int height) {
