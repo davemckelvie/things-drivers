@@ -12,10 +12,19 @@ public class LedCharacterDisplay implements CharacterDisplay {
   private final int width;
   private final int height;
 
-  // some ascii characters
-  private static final byte STX = 5;
-  private static final byte ETX = 6;
-  private static final byte SPACE = 0x20;
+  // ascii command characters
+  private static final byte STX = 2; // start of text
+  private static final byte ETX = 3; // end of text
+
+  // display commands (reusing ascii command characters)
+  private static final byte CMD_PRINT_LINE = 0x04;
+  private static final byte CMD_CLEAR_LINE = 0x05;
+  private static final byte CMD_CLEAR_DISP = 0x06;
+  private static final byte CMD_SET_CHARACTER = 0x07;
+
+  // Protocol
+  // | start | command | param | data | end |
+  // | STX   | 0xXX    | 0xYY  | ...  | ETX |
 
   public LedCharacterDisplay(int width, int height) {
     this.width = width;
@@ -38,8 +47,9 @@ public class LedCharacterDisplay implements CharacterDisplay {
   }
 
   private byte[] toPacket(int line, String message) {
-    ByteBuffer bb = ByteBuffer.allocate(3 + message.length());
+    ByteBuffer bb = ByteBuffer.allocate(4 + message.length());
     bb.put(STX);
+    bb.put(CMD_PRINT_LINE);
     bb.put((byte)(line & 0xFF));
     bb.put(message.getBytes());
     bb.put(ETX);
@@ -61,17 +71,16 @@ public class LedCharacterDisplay implements CharacterDisplay {
 
   @Override
   public void clearLine(int line) {
-    byte[] buffer = new byte[1 + width];
-    Arrays.fill(buffer, SPACE);
-    buffer[0] = (byte) (line & 0xFF);
+    byte[] buffer = new byte[2];
+    buffer[0] = CMD_CLEAR_LINE;
+    buffer[1] = (byte) (line & 0xFF);
     device.write(toPacket(buffer));
   }
 
   @Override
   public void clearDisplay() {
-    for (int i = 0; i < height; i++) {
-      clearLine(i + 1);
-    }
+    byte[] buffer = new byte[]{CMD_CLEAR_DISP};
+    device.write(toPacket(buffer));
   }
 
   @Override
