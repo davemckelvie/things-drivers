@@ -268,7 +268,8 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   public UserSensor getUserSensor() {
-    return UserSensor.builder()
+    UserSensor.Builder builder = new UserSensor.Builder();
+    return builder
             .setName("tcs3472")
             .setVendor("TAOS")
             .setType(Sensor.TYPE_LIGHT)

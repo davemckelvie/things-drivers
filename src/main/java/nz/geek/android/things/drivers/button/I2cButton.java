@@ -107,7 +107,8 @@ public class I2cButton {
    */
   private void initInputDriver() {
 
-    inputDriver = InputDriver.builder(InputDevice.SOURCE_CLASS_BUTTON)
+    InputDriver.Builder builder = new InputDriver.Builder(InputDevice.SOURCE_CLASS_BUTTON);
+    inputDriver = builder
             .setName(TAG)
             .setVersion(DRIVER_VERSION)
             .setKeys(toIntArray(buttonMap.values().toArray(new Integer[buttonMap.size()])))
