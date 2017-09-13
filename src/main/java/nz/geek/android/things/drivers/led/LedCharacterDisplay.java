@@ -8,9 +8,11 @@ import nz.geek.android.things.drivers.spi.LedMatrixController;
 
 public class LedCharacterDisplay implements CharacterDisplay {
 
+  private static final int MAX_CUSTOM_ADDRESS = 0x1F;
   private LedMatrixController device;
   private final int width;
   private final int height;
+  private int lastCustomAddressUsed = MAX_CUSTOM_ADDRESS;
 
   // ascii command characters
   private static final byte STX = 2; // start of text
@@ -21,6 +23,10 @@ public class LedCharacterDisplay implements CharacterDisplay {
   private static final byte CMD_CLEAR_LINE = 0x05;
   private static final byte CMD_CLEAR_DISP = 0x06;
   private static final byte CMD_SET_CHARACTER = 0x07;
+  private static final byte CMD_DISPLAY_ON = 0x08;
+  private static final byte CMD_DISPLAY_OFF = 0x09;
+
+  private static final byte CUSTOM_CHAR_ADDRESS = 0x1F; // reuse ascii command character 'US'
 
   // Protocol
   // | start | command | param | data | end |
@@ -43,6 +49,15 @@ public class LedCharacterDisplay implements CharacterDisplay {
     if (device != null) {
       device.close();
       device = null;
+    }
+  }
+
+  @Override
+  public void enable(boolean enable) {
+    if (enable) {
+      device.write(toPacket(new byte[]{CMD_DISPLAY_ON}));
+    } else {
+      device.write(toPacket(new byte[]{CMD_DISPLAY_OFF}));
     }
   }
 
@@ -105,7 +120,20 @@ public class LedCharacterDisplay implements CharacterDisplay {
 
   @Override
   public void setCustomCharacter(int address, byte[] pattern) {
-    // TODO: 10/09/17
+    ByteBuffer bb = ByteBuffer.allocate(pattern.length + 2);
+    bb.put(CMD_SET_CHARACTER);
+    bb.put(CUSTOM_CHAR_ADDRESS);
+    bb.put(pattern);
+    device.write(toPacket(bb.array()));
+  }
+
+  @Override
+  public int setCustomCharacter(byte[] pattern) {
+    if (lastCustomAddressUsed < 0) {
+      lastCustomAddressUsed = MAX_CUSTOM_ADDRESS;
+    }
+    setCustomCharacter(lastCustomAddressUsed, pattern);
+    return lastCustomAddressUsed--;
   }
 
   @Override

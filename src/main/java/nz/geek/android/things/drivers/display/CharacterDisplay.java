@@ -15,6 +15,12 @@ public interface CharacterDisplay {
   void disconnect();
 
   /**
+   * Enable the display
+   * @param enable true to enable, false to disable
+   */
+  void enable(boolean enable);
+
+  /**
    * Print a message to the display starting at the given display line
    * @param line  the line to print the message [1:height]
    * @param message the message to print
@@ -77,6 +83,14 @@ public interface CharacterDisplay {
    * @param pattern the bit pattern to write
    */
   void setCustomCharacter(int address, byte[] pattern);
+
+  /**
+   * Variant of {@link #setCustomCharacter(int, byte[])} that returns the address used
+   * to store the custom character
+   * @param pattern bit pattern of the custom character
+   * @return the address used
+   */
+  int setCustomCharacter(byte[] pattern);
 
   /**
    * Load bargraph characters into CGRAM

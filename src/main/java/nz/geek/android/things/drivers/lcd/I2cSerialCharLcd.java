@@ -169,6 +169,11 @@ public class I2cSerialCharLcd implements CharacterDisplay {
     }
   }
 
+  @Override
+  public void enable(boolean enable) {
+    // TODO: 13/09/17  
+  }
+
   /**
    * print a message to the display
    * @param line the line number to print to
@@ -309,6 +314,12 @@ public class I2cSerialCharLcd implements CharacterDisplay {
       setCgRamPattern(address, pattern);
       switchDisplay(1);
     }
+  }
+
+  @Override
+  public int setCustomCharacter(byte[] pattern) {
+    // TODO: 12/09/17   
+    return 0;
   }
 
   @Override
