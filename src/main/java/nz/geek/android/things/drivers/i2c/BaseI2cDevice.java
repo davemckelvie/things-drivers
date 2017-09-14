@@ -34,13 +34,11 @@ public abstract class BaseI2cDevice {
   protected static String getBus() {
     PeripheralManagerService peripheralManagerService = new PeripheralManagerService();
     List<String> deviceList = peripheralManagerService.getI2cBusList();
-    String bus;
     if (deviceList.isEmpty()) {
-      bus = "I2C1";
+      return "I2C1";
     } else {
-      bus = deviceList.get(0);
+      return deviceList.get(0);
     }
-    return bus;
   }
 
   @Nullable
