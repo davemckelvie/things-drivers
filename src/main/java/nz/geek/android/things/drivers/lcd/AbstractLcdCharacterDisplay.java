@@ -3,7 +3,7 @@ package nz.geek.android.things.drivers.lcd;
 import nz.geek.android.things.drivers.display.CharacterDisplay;
 
 
-public abstract class AbstractCharacterDisplay implements CharacterDisplay {
+public abstract class AbstractLcdCharacterDisplay implements CharacterDisplay {
 
   protected static final int SPACE = 0x20;
 
@@ -49,7 +49,7 @@ public abstract class AbstractCharacterDisplay implements CharacterDisplay {
 
   protected boolean doubleWrite = false;
 
-  protected AbstractCharacterDisplay(int width, int height, boolean hasBackLight) {
+  protected AbstractLcdCharacterDisplay(int width, int height, boolean hasBackLight) {
     this.width = width;
     this.height = height;
     this.hasBackLight = hasBackLight;

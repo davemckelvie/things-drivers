@@ -21,7 +21,7 @@ import nz.geek.android.things.drivers.i2c.Pcf8574;
 
 import static nz.geek.android.things.drivers.i2c.Pcf8574.BV;
 
-public class I2cSerialCharLcd extends AbstractCharacterDisplay {
+public class I2cSerialCharLcd extends AbstractLcdCharacterDisplay {
 
   private Pcf8574 pcf8574;
 

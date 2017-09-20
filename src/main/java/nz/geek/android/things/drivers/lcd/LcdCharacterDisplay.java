@@ -5,7 +5,7 @@ import com.google.android.things.pio.Gpio;
 import java.io.IOException;
 
 
-public class LcdCharacterDisplay extends AbstractCharacterDisplay {
+public class LcdCharacterDisplay extends AbstractLcdCharacterDisplay {
 
   private Gpio ePin;
 
