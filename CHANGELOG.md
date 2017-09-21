@@ -1,3 +1,8 @@
+## 1.3.0 (2017-09-21)
+
+  - refactor Lcd interface to CharacterDisplay
+  - implement LedCharacterDisplay
+
 ## 1.2.4 (2017-01-25)
 
   - add getPin() and readByte() to pcf8574
