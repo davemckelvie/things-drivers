@@ -31,6 +31,7 @@ public class BaseSpiDevice {
       SpiDevice spiDevice = peripheralManagerService.openSpiDevice(bus);
       spiDevice.setMode(SpiDevice.MODE0);
       spiDevice.setBitJustification(false);
+      spiDevice.setBitsPerWord(8);
       spiDevice.setFrequency(4500000);
       return spiDevice;
     } catch (IOException e) {
