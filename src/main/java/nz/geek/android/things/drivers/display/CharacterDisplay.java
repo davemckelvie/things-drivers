@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017 Dave McKelvie <www.android.geek.nz>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nz.geek.android.things.drivers.display;
 
 /**
@@ -63,10 +78,10 @@ public interface CharacterDisplay {
   int getHeight();
 
   /**
-   * OK, it's a bit of a stretch to put this method into the interface,
-   * it's not applicable to LED displays (or is it?).
    *
-   * write a bit pattern to CGRAM to generate a custom character
+   * write a bit pattern for a custom character to the display. What the
+   * bit pattern means depends on the display, for an LCD display the
+   * bit pattern is defined as:
    *
    * <pre>
    * bit pattern     eg          hex
@@ -79,7 +94,7 @@ public interface CharacterDisplay {
    * ---XXXXX        X   X       11
    * ---XXXXX        XXXX        1E
    * </pre>
-   * @param address the CGRAM address to write the bit pattern to.
+   * @param address the 'address' to write the bit pattern to.
    * @param pattern the bit pattern to write
    */
   void setCustomCharacter(int address, byte[] pattern);
@@ -93,7 +108,7 @@ public interface CharacterDisplay {
   int setCustomCharacter(byte[] pattern);
 
   /**
-   * Load bargraph characters into CGRAM
+   * initialise custom characters for the display of bar graphs
    */
   void initBarGraph();
 
