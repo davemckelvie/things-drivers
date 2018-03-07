@@ -18,7 +18,7 @@ package nz.geek.android.things.drivers.i2c;
 import android.support.annotation.Nullable;
 
 import com.google.android.things.pio.I2cDevice;
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,8 +32,8 @@ public abstract class BaseI2cDevice {
   }
 
   protected static String getBus() {
-    PeripheralManagerService peripheralManagerService = new PeripheralManagerService();
-    List<String> deviceList = peripheralManagerService.getI2cBusList();
+    PeripheralManager peripheralManager = PeripheralManager.getInstance();
+    List<String> deviceList = peripheralManager.getI2cBusList();
     if (deviceList.isEmpty()) {
       return "I2C1";
     } else {
@@ -43,10 +43,10 @@ public abstract class BaseI2cDevice {
 
   @Nullable
   protected static I2cDevice getDevice(String bus, int address) {
-    PeripheralManagerService peripheralManagerService = new PeripheralManagerService();
+    PeripheralManager peripheralManager = PeripheralManager.getInstance();
     I2cDevice device = null;
     try {
-      device = peripheralManagerService.openI2cDevice(bus, address);
+      device = peripheralManager.openI2cDevice(bus, address);
 
     } catch (IOException e) {
       e.printStackTrace();

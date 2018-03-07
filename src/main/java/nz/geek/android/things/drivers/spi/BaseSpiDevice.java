@@ -1,6 +1,6 @@
 package nz.geek.android.things.drivers.spi;
 
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.pio.SpiDevice;
 
 import java.io.IOException;
@@ -15,8 +15,8 @@ public class BaseSpiDevice {
   }
 
   protected static String getBus() {
-    PeripheralManagerService peripheralManagerService = new PeripheralManagerService();
-    List<String> deviceList = peripheralManagerService.getSpiBusList();
+    PeripheralManager peripheralManager = PeripheralManager.getInstance();
+    List<String> deviceList = peripheralManager.getSpiBusList();
     if (deviceList.isEmpty()) {
       return "SPI0.0";
     } else {
@@ -25,10 +25,10 @@ public class BaseSpiDevice {
   }
 
   protected static SpiDevice getDevice(String bus) {
-    PeripheralManagerService peripheralManagerService = new PeripheralManagerService();
+    PeripheralManager peripheralManager = PeripheralManager.getInstance();
 
     try {
-      SpiDevice spiDevice = peripheralManagerService.openSpiDevice(bus);
+      SpiDevice spiDevice = peripheralManager.openSpiDevice(bus);
       spiDevice.setMode(SpiDevice.MODE0);
       spiDevice.setBitJustification(false);
       spiDevice.setBitsPerWord(8);

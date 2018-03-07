@@ -1,7 +1,6 @@
 package nz.geek.android.things.drivers.led;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import nz.geek.android.things.drivers.display.CharacterDisplay;
 import nz.geek.android.things.drivers.spi.LedMatrixController;

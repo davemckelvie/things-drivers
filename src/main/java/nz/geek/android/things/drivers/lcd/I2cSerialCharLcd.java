@@ -15,7 +15,7 @@
  */
 package nz.geek.android.things.drivers.lcd;
 
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 
 import nz.geek.android.things.drivers.i2c.Pcf8574;
 
@@ -289,7 +289,7 @@ public class I2cSerialCharLcd extends AbstractLcdCharacterDisplay {
 
     /**
      * Specify the name of the I2C bus that the LCD is connected to
-     * @param bus the name of the bus returned from {@link PeripheralManagerService#getI2cBusList()}
+     * @param bus the name of the bus returned from {@link PeripheralManager#getI2cBusList()}
      * @return the builder
      */
     public I2cSerialCharLcdBuilder withBus(String bus) {
