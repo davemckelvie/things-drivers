@@ -22,9 +22,9 @@ import android.os.HandlerThread;
 import com.google.android.things.pio.I2cDevice;
 import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.userdriver.UserDriverManager;
-import com.google.android.things.userdriver.UserSensor;
-import com.google.android.things.userdriver.UserSensorDriver;
-import com.google.android.things.userdriver.UserSensorReading;
+import com.google.android.things.userdriver.sensor.UserSensor;
+import com.google.android.things.userdriver.sensor.UserSensorDriver;
+import com.google.android.things.userdriver.sensor.UserSensorReading;
 
 import java.io.IOException;
 
@@ -93,7 +93,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   private UserSensor luxSensor;
   private LuxSensorDriver luxSensorDriver;
 
-  private class LuxSensorDriver extends UserSensorDriver {
+  private class LuxSensorDriver implements UserSensorDriver {
 
     private float lux = 0.0f;
     public void setLux(float lux) {
@@ -160,7 +160,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
       handlerThread = null;
     }
     if (luxSensor != null) {
-      UserDriverManager manager = UserDriverManager.getManager();
+      UserDriverManager manager = UserDriverManager.getInstance();
       manager.unregisterSensor(luxSensor);
       luxSensor = null;
     }
@@ -262,7 +262,7 @@ public class Tcs34725 extends BaseI2cDevice implements Runnable {
   }
 
   public void registerSensorDriver() {
-    UserDriverManager manager = UserDriverManager.getManager();
+    UserDriverManager manager = UserDriverManager.getInstance();
     luxSensor = getUserSensor();
     manager.registerSensor(luxSensor);
   }
