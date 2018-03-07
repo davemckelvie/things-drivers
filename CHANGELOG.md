@@ -1,3 +1,7 @@
+## 1.7.0 (2018-03-07)
+
+  - updated for Android Things developer preview 0.7
+
 ## 1.3.0 (2017-09-21)
 
   - refactor Lcd interface to CharacterDisplay

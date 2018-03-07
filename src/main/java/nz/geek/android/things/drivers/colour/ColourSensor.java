@@ -17,7 +17,7 @@ package nz.geek.android.things.drivers.colour;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ public class ColourSensor {
   private GpioCallback gpioCallback = new GpioCallback() {
     @Override
     public boolean onGpioEdge(Gpio gpio) {
-      return super.onGpioEdge(gpio);
+      return true;
     }
   };
 
@@ -45,9 +45,9 @@ public class ColourSensor {
    * private constructor, use {@link ColourSensorBuilder} to create.
    * @param bus the I2C bus that the sensor is connected to.
    * @param ledGpio the {@link Gpio} that the sensor LED is connected to. (optional)
-   * @param ledGpioName the name of the {@link Gpio}, a String returned by {@link PeripheralManagerService#getGpioList()} (optional)
+   * @param ledGpioName the name of the {@link Gpio}, a String returned by {@link PeripheralManager#getGpioList()} (optional)
    * @param interruptGpio the {@link Gpio} to use as and interrupt from the sensor. (optional)
-   * @param interruptGpioName the name of the {@link Gpio}, a String returned by {@link PeripheralManagerService#getGpioList()} (optional)
+   * @param interruptGpioName the name of the {@link Gpio}, a String returned by {@link PeripheralManager#getGpioList()} (optional)
    * @param listener a {@link ColourSensor.Listener} interested in sensor readings (optional)
    */
   private ColourSensor(String bus, Gpio ledGpio, String ledGpioName, Gpio interruptGpio, String interruptGpioName,
@@ -80,7 +80,7 @@ public class ColourSensor {
   private void initLedGpio() {
     if (ledGpio == null && ledGpioName == null) return;
     if (ledGpio == null) {
-      PeripheralManagerService manager = new PeripheralManagerService();
+      PeripheralManager manager = PeripheralManager.getInstance();
       try {
         ledGpio  = manager.openGpio(ledGpioName);
       } catch (IOException e) {
@@ -99,7 +99,7 @@ public class ColourSensor {
   private void initInterruptGpio() {
     if (interruptGpio == null && interruptGpioName == null) return;
     if (interruptGpio == null) {
-      PeripheralManagerService manager = new PeripheralManagerService();
+      PeripheralManager manager = PeripheralManager.getInstance();
       try {
         interruptGpio = manager.openGpio(interruptGpioName);
       } catch (IOException e) {
@@ -180,8 +180,8 @@ public class ColourSensor {
 
     /**
      * Specify the I2C bus that the colour sensor is connected to.
-     * If not specified the first bus returned by {@link PeripheralManagerService#getI2cBusList()} is used.
-     * @param bus the name of a I2C bus returned by {@link PeripheralManagerService#getI2cBusList()}
+     * If not specified the first bus returned by {@link PeripheralManager#getI2cBusList()} is used.
+     * @param bus the name of a I2C bus returned by {@link PeripheralManager#getI2cBusList()}
      * @return the builder
      */
     public ColourSensorBuilder withBus(String bus) {
@@ -192,7 +192,7 @@ public class ColourSensor {
     /**
      * Specify the {@link Gpio} connected to the module LED. This will be used to control a light source for
      * the sensor.
-     * @param gpio the {@link Gpio} returned by {@link PeripheralManagerService#openGpio(String)}
+     * @param gpio the {@link Gpio} returned by {@link PeripheralManager#openGpio(String)}
      * @return the builder
      */
     public ColourSensorBuilder withLedGpio(Gpio gpio) {
@@ -203,7 +203,7 @@ public class ColourSensor {
     /**
      * Specify the {@link Gpio} connected to the module LED by name. Use this method instead of
      * {@link #withLedGpio(Gpio)} to use the name of the {@link Gpio}, one of the names returned
-     * by {@link PeripheralManagerService#getGpioList()}
+     * by {@link PeripheralManager#getGpioList()}
      * @param gpioName the name of the {@link Gpio} to use
      * @return the builder
      */
@@ -214,7 +214,7 @@ public class ColourSensor {
 
     /**
      * Specify the {@link Gpio} connected to the colour sensor interrupt.
-     * @param gpio the {@link Gpio} returned by {@link PeripheralManagerService#openGpio(String)}
+     * @param gpio the {@link Gpio} returned by {@link PeripheralManager#openGpio(String)}
      * @return the builder
      */
     public ColourSensorBuilder withInterruptGpio(Gpio gpio) {
@@ -225,7 +225,7 @@ public class ColourSensor {
     /**
      * Specify the {@link Gpio} connected to the colour sensor interrupt by name. Use this method instead of
      * {@link #withInterruptGpio(Gpio)} to use the name of the {@link Gpio}, one of the names returned
-     * by {@link PeripheralManagerService#getGpioList()}
+     * by {@link PeripheralManager#getGpioList()}
      * @param gpioName the name of the {@link Gpio} to use
      * @return the builder
      */

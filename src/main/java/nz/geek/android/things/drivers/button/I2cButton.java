@@ -23,7 +23,7 @@ import android.view.KeyEvent;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
-import com.google.android.things.userdriver.InputDriver;
+import com.google.android.things.userdriver.input.InputDriver;
 import com.google.android.things.userdriver.UserDriverManager;
 
 import java.io.IOException;
@@ -114,7 +114,7 @@ public class I2cButton {
             .setKeys(toIntArray(buttonMap.values().toArray(new Integer[buttonMap.size()])))
             .build();
 
-    UserDriverManager manager = UserDriverManager.getManager();
+    UserDriverManager manager = UserDriverManager.getInstance();
     manager.registerInputDriver(inputDriver);
   }
 
@@ -167,7 +167,7 @@ public class I2cButton {
   };
 
   public void close() {
-    UserDriverManager manager = UserDriverManager.getManager();
+    UserDriverManager manager = UserDriverManager.getInstance();
     manager.unregisterInputDriver(inputDriver);
     if (gpio != null) {
       try {
@@ -219,7 +219,7 @@ public class I2cButton {
 
     /**
      * Specify the GPIO that the INT pin of the PCF8574 is connected to.
-     * @param gpio the GPIO returned from {@link com.google.android.things.pio.PeripheralManagerService#openGpio(String)}
+     * @param gpio the GPIO returned from {@link com.google.android.things.pio.PeripheralManager#openGpio(String)}
      * @return builder
      */
     public final I2cButtonBuilder withInterrupt(@Nullable Gpio gpio) {
