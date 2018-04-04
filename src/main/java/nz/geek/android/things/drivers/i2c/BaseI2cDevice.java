@@ -44,14 +44,21 @@ public abstract class BaseI2cDevice {
   @Nullable
   protected static I2cDevice getDevice(String bus, int address) {
     PeripheralManager peripheralManager = PeripheralManager.getInstance();
-    I2cDevice device = null;
-    try {
-      device = peripheralManager.openI2cDevice(bus, address);
 
+    try {
+      return peripheralManager.openI2cDevice(bus, address);
     } catch (IOException e) {
-      e.printStackTrace();
+      return null;
     }
-    return device;
+  }
+
+  /**
+   * return the bit value of pin number
+   * @param pin number [0:7]
+   * @return bit value [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80]
+   */
+  public static int BV(int pin) {
+    return (1 << pin);
   }
 
   protected void close() {
