@@ -17,6 +17,7 @@ public class I2cPwm implements Pwm {
   private final Pcf9685 pcf9685;
   private final int pin;
   private double dutyCycle;
+  private double frequency;
 
   /**
    * This constructor expects the given name to be in the format
@@ -51,6 +52,7 @@ public class I2cPwm implements Pwm {
   @Override
   public void setPwmFrequencyHz(double frequency) throws IOException {
     pcf9685.setPwmFrequencyHz(frequency);
+    this.frequency = frequency;
   }
 
   @Override

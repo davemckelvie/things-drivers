@@ -1,5 +1,7 @@
 package nz.geek.android.things.drivers.i2c;
 
+import android.util.Log;
+
 import com.google.android.things.pio.I2cDevice;
 
 import java.io.IOException;
@@ -13,8 +15,10 @@ public class Pcf9685 extends BaseI2cDevice {
 
   private static final int MIN_FREQ = 24;
   private static final int MAX_FREQ = 1526;
-  private static final int CLK_FREQ = 250000000;
+  private static final int CLK_FREQ = 25000000;
   private static final int NUM_PINS = 16;
+  private static final double MIN_DUTY_CYCLE = 0.0;
+  private static final double MAX_DUTY_CYCLE = 100.0;
 
   /**
    * MODE 1 register definitions
@@ -104,12 +108,12 @@ public class Pcf9685 extends BaseI2cDevice {
     }
 
     // from datasheet (7.3.5)
-    int preScale = Math.round((int) (CLK_FREQ / (4096 * frequency))) - 1;
+    int preScale = Math.round((float) (CLK_FREQ / (4096 * frequency))) - 1;
 
     int mode1 = device.readRegByte(MODE_1_ADDR);
 
     // put to sleep
-    int newMode = mode1 & BV(SLEEP);
+    int newMode = mode1 | BV(SLEEP);
     device.writeRegByte(MODE_1_ADDR, (byte)(newMode & 0xFF));
 
     // write preScale value
@@ -128,7 +132,7 @@ public class Pcf9685 extends BaseI2cDevice {
    * @throws IOException on I2C exception
    */
   public void setPwmDutyCycle(double dutyCycle, int pin) throws IllegalArgumentException, IOException {
-    if (dutyCycle < 0.0 || dutyCycle > 100.0) throw new IllegalArgumentException("duty cycle out of range");
+    if (dutyCycle < MIN_DUTY_CYCLE || dutyCycle > MAX_DUTY_CYCLE) throw new IllegalArgumentException("duty cycle out of range");
 
     int offTime = (int)Math.floor(4095 / 100 * dutyCycle);
 
