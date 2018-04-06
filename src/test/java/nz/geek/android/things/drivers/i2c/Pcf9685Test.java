@@ -67,4 +67,12 @@ public class Pcf9685Test {
     pcf9685.setPinPwmOnOff(409, 1228, 3);
     verify(device).writeRegBuffer(0x12, buffer, 4);
   }
+
+  @Test
+  public void testSetPin() throws IOException {
+    pcf9685.setPin(true, 4);
+    verify(device).writeRegBuffer(0x16, new byte[]{0, 16, 0, 0}, 4);
+    pcf9685.setPin(false, 5);
+    verify(device).writeRegBuffer(0x1A, new byte[]{0, 0, 0, 16}, 4);
+  }
 }
