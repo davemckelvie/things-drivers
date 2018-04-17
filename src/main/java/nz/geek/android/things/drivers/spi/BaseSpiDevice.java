@@ -30,7 +30,7 @@ public class BaseSpiDevice {
     try {
       SpiDevice spiDevice = peripheralManager.openSpiDevice(bus);
       spiDevice.setMode(SpiDevice.MODE0);
-      spiDevice.setBitJustification(false);
+      spiDevice.setBitJustification(SpiDevice.BIT_JUSTIFICATION_MSB_FIRST);
       spiDevice.setBitsPerWord(8);
       spiDevice.setFrequency(4500000);
       return spiDevice;
