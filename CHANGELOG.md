@@ -1,3 +1,7 @@
+## 1.8.0 (2018-04-17)
+
+  - updated for Android Things developer preview 0.8
+
 ## 1.7.0 (2018-03-07)
 
   - updated for Android Things developer preview 0.7
