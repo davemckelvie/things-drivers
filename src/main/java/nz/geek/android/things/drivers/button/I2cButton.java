@@ -25,6 +25,7 @@ import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
 import com.google.android.things.userdriver.input.InputDriver;
 import com.google.android.things.userdriver.UserDriverManager;
+import com.google.android.things.userdriver.input.InputDriverEvent;
 
 import java.io.IOException;
 import java.util.Map;
@@ -107,11 +108,10 @@ public class I2cButton {
    */
   private void initInputDriver() {
 
-    InputDriver.Builder builder = new InputDriver.Builder(InputDevice.SOURCE_CLASS_BUTTON);
+    InputDriver.Builder builder = new InputDriver.Builder();
     inputDriver = builder
             .setName(TAG)
-            .setVersion(DRIVER_VERSION)
-            .setKeys(toIntArray(buttonMap.values().toArray(new Integer[buttonMap.size()])))
+            .setSupportedKeys(toIntArray(buttonMap.values().toArray(new Integer[buttonMap.size()])))
             .build();
 
     UserDriverManager manager = UserDriverManager.getInstance();
@@ -124,9 +124,9 @@ public class I2cButton {
    * @param keyCode the keycode of the pressed key
    */
   private void triggerEvent(boolean pressed, int keyCode) {
-    int action = pressed ? KeyEvent.ACTION_DOWN : KeyEvent.ACTION_UP;
-    KeyEvent[] events = new KeyEvent[] {new KeyEvent(action, keyCode)};
-    inputDriver.emit(events);
+    InputDriverEvent event = new InputDriverEvent();
+    event.setKeyPressed(keyCode, pressed);
+    inputDriver.emit(event);
   }
 
   /**
