@@ -1,4 +1,18 @@
-package nz.geek.android.things.drivers.spi;
+/*
+ * Copyright 2018 Dave McKelvie <www.android.geek.nz>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */package nz.geek.android.things.drivers.spi;
 
 import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.pio.SpiDevice;
@@ -6,11 +20,11 @@ import com.google.android.things.pio.SpiDevice;
 import java.io.IOException;
 import java.util.List;
 
-public class BaseSpiDevice {
+public class BaseSpiDevice implements AutoCloseable{
 
   protected final SpiDevice device;
 
-  public BaseSpiDevice(SpiDevice device) {
+  protected BaseSpiDevice(SpiDevice device) {
     this.device = device;
   }
 
@@ -44,18 +58,19 @@ public class BaseSpiDevice {
     if (device != null) {
       try {
         device.write(data, data.length);
-      } catch (IOException e) {
+      } catch (IOException ignore) {
         //
       }
     }
   }
 
+  @Override
   public void close() {
     if (device != null) {
       try {
         device.close();
-      } catch (IOException e) {
-        // Boo!
+      } catch (IOException ignore) {
+        //
       }
     }
   }

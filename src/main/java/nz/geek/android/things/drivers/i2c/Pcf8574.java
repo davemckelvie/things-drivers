@@ -15,6 +15,8 @@
  */
 package nz.geek.android.things.drivers.i2c;
 
+import android.support.annotation.VisibleForTesting;
+
 import com.google.android.things.pio.I2cDevice;
 
 import java.io.IOException;
@@ -48,6 +50,7 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
    * Constructor given I2cDevice for testing with mock device
    * @param device I2cDevice of the port
    */
+  @VisibleForTesting
   /* package */ Pcf8574(I2cDevice device) {
     super(device);
   }
@@ -122,11 +125,6 @@ public class Pcf8574 extends BaseI2cDevice implements IoPort {
     if (pin < 0 || pin > 7) return false;
     int value = readByte();
     return ((value & BV(pin)) == BV(pin));
-  }
-
-  @Override
-  public void close() {
-    super.close();
   }
 
   @Override

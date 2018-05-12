@@ -23,7 +23,9 @@ import com.google.android.things.pio.PeripheralManager;
 import java.io.IOException;
 import java.util.List;
 
-public abstract class BaseI2cDevice {
+public abstract class BaseI2cDevice implements AutoCloseable {
+
+  private static final String DEFAULT_BUS = "I2C1";
 
   protected final I2cDevice device;
 
@@ -31,23 +33,33 @@ public abstract class BaseI2cDevice {
     this.device = device;
   }
 
+  /**
+   * Convenience method to get an I2C bus
+   * @return the first bus or a default bus
+   */
   protected static String getBus() {
     PeripheralManager peripheralManager = PeripheralManager.getInstance();
     List<String> deviceList = peripheralManager.getI2cBusList();
     if (deviceList.isEmpty()) {
-      return "I2C1";
+      return DEFAULT_BUS;
     } else {
       return deviceList.get(0);
     }
   }
 
+  /**
+   * Convenience method to get an I2cDevice on the given bus with the given I2C address
+   * @param bus the bus that the device is connected to
+   * @param address the address of the device
+   * @return the opened device or null
+   */
   @Nullable
   protected static I2cDevice getDevice(String bus, int address) {
     PeripheralManager peripheralManager = PeripheralManager.getInstance();
 
     try {
       return peripheralManager.openI2cDevice(bus, address);
-    } catch (IOException e) {
+    } catch (IOException | RuntimeException e) {
       return null;
     }
   }
@@ -55,18 +67,19 @@ public abstract class BaseI2cDevice {
   /**
    * return the bit value of pin number
    * @param pin number [0:7]
-   * @return bit value [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80]
+   * @return bit value [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80] etc
    */
   public static int BV(int pin) {
     return (1 << pin);
   }
 
-  protected void close() {
+  @Override
+  public void close() {
     if (device != null) {
       try {
         device.close();
-      } catch (IOException e) {
-        // Boo!
+      } catch (IOException ignore) {
+
       }
     }
   }
