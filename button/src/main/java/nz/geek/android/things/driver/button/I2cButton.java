@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nz.geek.android.things.driver.driver.button;
+package nz.geek.android.things.driver.button;
 
 import android.support.annotation.Nullable;
 import android.util.ArrayMap;
