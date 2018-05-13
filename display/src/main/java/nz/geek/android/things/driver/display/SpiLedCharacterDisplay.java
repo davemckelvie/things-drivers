@@ -2,9 +2,6 @@ package nz.geek.android.things.driver.display;
 
 import java.nio.ByteBuffer;
 
-import nz.geek.android.things.drivers.display.CharacterDisplay;
-import nz.geek.android.things.drivers.spi.LedMatrixController;
-
 public class SpiLedCharacterDisplay implements CharacterDisplay {
 
   private static final int MAX_CUSTOM_ADDRESS = 0x1F;

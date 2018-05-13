@@ -1,8 +1,5 @@
 package nz.geek.android.things.driver.display;
 
-import nz.geek.android.things.drivers.display.CharacterDisplay;
-
-
 public abstract class AbstractLcdCharacterDisplay implements CharacterDisplay {
 
   protected static final int SPACE = 0x20;

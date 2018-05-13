@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nz.geek.android.things.drivers.i2c.Pcf9685;
+import nz.geek.android.things.driver.pcf9685.Pcf9685;
+
 
 public class PwmManager {
 

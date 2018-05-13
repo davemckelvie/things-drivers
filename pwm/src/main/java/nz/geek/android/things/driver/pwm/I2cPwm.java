@@ -19,7 +19,7 @@ import com.google.android.things.pio.Pwm;
 
 import java.io.IOException;
 
-import nz.geek.android.things.drivers.i2c.Pcf9685;
+import nz.geek.android.things.driver.pcf9685.Pcf9685;
 
 /**
  * A wrapper around the pcf9685 that implements the {@code Pwm} interface. This is
