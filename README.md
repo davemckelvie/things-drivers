@@ -6,9 +6,6 @@ Here you will find some Android Things um, things, drivers and such.
 
 ## I2C Things
 
-PCF8574(A)
-
-![Raspberry Pi Hookup](rpi3_pcf8574.png)
 
 PCF8591
 
