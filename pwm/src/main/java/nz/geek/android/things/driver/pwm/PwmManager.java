@@ -10,14 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nz.geek.android.things.driver.pcf9685.Pcf9685;
+import nz.geek.android.things.driver.pca9685.Pca9685;
 
 
 public class PwmManager {
 
   private static final String TAG = "PwmManager";
   private static PwmManager INSTANCE;
-  private List<Pcf9685> pcf9685List = new ArrayList<>();
+  private List<Pca9685> pca9685List = new ArrayList<>();
   private Map<String, Pwm> pwmMap = new HashMap<>();
   private PwmManager(){}
 
@@ -32,9 +32,9 @@ public class PwmManager {
     PeripheralManager peripheralManager = PeripheralManager.getInstance();
     List<String> i2cList = peripheralManager.getI2cBusList();
     for (String bus : i2cList) {
-      Pcf9685 pcf9685 = Pcf9685.create(0, bus);
-      if (pcf9685 != null) {
-        pcf9685List.add(pcf9685);
+      Pca9685 pca9685 = Pca9685.create(0, bus);
+      if (pca9685 != null) {
+        pca9685List.add(pca9685);
       }
     }
     createPwmMap();
@@ -45,11 +45,11 @@ public class PwmManager {
    * create a mapping between a PWM name and it
    */
   private void createPwmMap() {
-    for (int i = 0; i < pcf9685List.size(); i++) {
+    for (int i = 0; i < pca9685List.size(); i++) {
       for (int j = 0; j < 16; j++) {
         String name = "PWM_" + i + "_PIN_" + j;
         Log.d(TAG, "createPwmMap: " + name);
-        pwmMap.put(name, new I2cPwm(name, pcf9685List.get(i)));
+        pwmMap.put(name, new I2cPwm(name, pca9685List.get(i)));
       }
     }
   }

@@ -1,8 +1,17 @@
 # DaSiAnThiLib (Dave's Simple Android Things Library)
 
-Here you will find some Android Things um, things, drivers and such.
+Here you will find some Android Things drivers.
 
 [ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-drivers/images/download.svg) ](https://bintray.com/davemckelvie/maven/things-drivers/_latestVersion)
+
+<!-- DRIVER_LIST_START -->
+Driver | Type | Usage (add to your gradle dependencies) | Note
+:---:|:---:| --- | ---
+[things-driver-display](display) | Character LCD and LED display diver | `implementation 'nz.geek.android.things.driver:things-driver-display'` | [changelog](display/CHANGELOG.md)
+[things-driver-pca9685](pca9685) | NXP 16 channel, 12 bit I2C PWM controller | `implementation 'nz.geek.android.things.driver:things-driver-pca9685'` | [changelog](pca9685/CHANGELOG.md)
+[things-driver-pcf8574](pcf8574) | NXP 8 bit I2C IO port | `implementation 'nz.geek.android.things.driver:things-driver-pcf8574:0.8'` |  [sample]()[changelog](pcf8574/CHANGELOG.md)
+[things-driver-pcf8591](pcf8591) | NXP I2C Analog to digital converter | `implementation 'nz.geek.android.things.driver:things-driver-pcf8591'` | [changelog](pcf8591/CHANGELOG.md)
+<!-- DRIVER_LIST_END -->
 
 ## I2C Things
 
@@ -16,12 +25,6 @@ PCF8591
 HD44870 type displays (via LCM1602)
 
 ![Raspberry Pi Hookup](rpi3_lcd.png)
-
-## Buttons
-
-Push buttons connected via PCF8574
-
-![Raspberry Pi Hookup](rpi3_buttons_lcd.png)
 
 ## Colour sensor
 
