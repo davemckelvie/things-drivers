@@ -10,7 +10,7 @@ How to use the driver
 
 ### Gradle dependency
 
-To use the `button` driver, simply add the line below to your project's `build.gradle`,
+To use the `button` driver, add the line below to your project's `build.gradle`,
 where `<version>` matches the last version of the driver available on [jcenter][jcenter].
 
 ```

@@ -1,7 +1,7 @@
 PCF8574 IO driver for Android Things
 ====================================
 
-[ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-driver-pcf8574/images/download.svg) ](https://bintray.com/davemckelvie/maven/things-driver-pcf8574/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-driver-pcf8574/images/download.svg) ][jcenter]
 
 Android Things driver for the [PCF8574](https://www.nxp.com/documents/data_sheet/PCF8574.pdf) 8 bit I2C IO port
 
@@ -10,7 +10,7 @@ How to use the driver
 
 ### Gradle dependency
 
-To use the `pcf8574` driver, simply add the line below to your project's `build.gradle`,
+To use the `pcf8574` driver, add the line below to your project's `build.gradle`,
 where `<version>` matches the last version of the driver available on [jcenter][jcenter].
 
 ```
@@ -32,9 +32,14 @@ import nz.geek.android.things.driver.pcf8574.Pcf8574;
 
 Pcf8574 pcf8574;
 
+// create a port with an address (the value of A0-A2), an I2C bus name,
+// and a flag to indicate that the port type is a PCF8574 as opposed to
+// a PCF8574A (which has a different base address)
+
 pcf8574 = Pcf8574.create(pcf8574Address, i2cBusName, isPcf8574);
 
-// Write to port
+// Write to port, the first argument is a bitmask, the second is
+// the data to write. Data does not affect port pins where mask bit is 1
 
 pcf8574.writeByte(0x00, 0x00);
 
@@ -68,3 +73,4 @@ License for the specific language governing permissions and limitations under
 the License.
 
 [jcenter]: https://bintray.com/davemckelvie/maven/things-driver-pcf8574/_latestVersion
+

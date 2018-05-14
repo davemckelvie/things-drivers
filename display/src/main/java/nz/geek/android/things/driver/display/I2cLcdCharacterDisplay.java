@@ -162,14 +162,14 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
     }
   }
 
-  public static I2cSerialCharLcdBuilder builder(int width, int height) {
-    return new I2cSerialCharLcdBuilder(width, height);
+  public static Builder builder(int width, int height) {
+    return new Builder(width, height);
   }
 
   /**
    * Builder used to create a {@link #I2cLcdCharacterDisplay(int, int, int, int, int, int, int, int, int, int, int, boolean, boolean, int, String)}
    */
-  public static final class I2cSerialCharLcdBuilder {
+  public static final class Builder {
     private int width;
     private int height;
 
@@ -186,7 +186,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
     private boolean hasBackLight = false;
     private String bus = null;
 
-    /*package*/ I2cSerialCharLcdBuilder(int width, int height) {
+    /*package*/ Builder(int width, int height) {
       this.width = width;
       this.height = height;
     }
@@ -197,7 +197,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param isPcf8574 true when PCF8574 should be used
      * @return
      */
-    public I2cSerialCharLcdBuilder isPcf8574(boolean isPcf8574) {
+    public Builder isPcf8574(boolean isPcf8574) {
       this.isPcf8574 = isPcf8574;
       return this;
 
@@ -208,7 +208,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param e1Pin enable pin [0:7]
      * @return
      */
-    public I2cSerialCharLcdBuilder e(int e1Pin) {
+    public Builder e(int e1Pin) {
       this.e1Pin = e1Pin;
       return this;
     }
@@ -220,7 +220,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param e2Pin Second anable pin [0:7]
      * @return
      */
-    public I2cSerialCharLcdBuilder e2(int e2Pin) {
+    public Builder e2(int e2Pin) {
       this.e2Pin = e2Pin;
       return this;
     }
@@ -230,7 +230,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param rsPin rs pin [0:7]
      * @return
      */
-    public I2cSerialCharLcdBuilder rs(int rsPin) {
+    public Builder rs(int rsPin) {
       this.rsPin = rsPin;
       return this;
     }
@@ -240,7 +240,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param rwPin rw pin [0:7]
      * @return
      */
-    public I2cSerialCharLcdBuilder rw(int rwPin) {
+    public Builder rw(int rwPin) {
       this.rwPin = rwPin;
       return this;
     }
@@ -254,7 +254,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param blPin backlight control pin [0:7]
      * @return
      */
-    public I2cSerialCharLcdBuilder bl(int blPin) {
+    public Builder bl(int blPin) {
       this.blPin = blPin;
       hasBackLight = true;
       return this;
@@ -268,7 +268,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param d7Pin LCD D7 pin
      * @return
      */
-    public I2cSerialCharLcdBuilder data(int d4Pin, int d5Pin, int d6Pin, int d7Pin) {
+    public Builder data(int d4Pin, int d5Pin, int d6Pin, int d7Pin) {
       this.d4Pin = d4Pin;
       this.d5Pin = d5Pin;
       this.d6Pin = d6Pin;
@@ -282,7 +282,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param address value of A0-A2 [1:7]
      * @return
      */
-    public I2cSerialCharLcdBuilder address(int address) {
+    public Builder address(int address) {
       this.address = address;
       return this;
     }
@@ -292,7 +292,7 @@ public class I2cLcdCharacterDisplay extends AbstractLcdCharacterDisplay {
      * @param bus the name of the bus returned from {@link PeripheralManager#getI2cBusList()}
      * @return the builder
      */
-    public I2cSerialCharLcdBuilder withBus(String bus) {
+    public Builder withBus(String bus) {
       this.bus = bus;
       return this;
     }
