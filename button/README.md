@@ -21,7 +21,7 @@ dependencies {
 
 ### Hardware hookup
 
-![Raspberry Pi Hookup](rpi3_pcf8574.png)
+![Raspberry Pi Hookup](rpi3_buttons_lcd.png)
 
 ### Sample usage
 

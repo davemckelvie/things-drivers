@@ -13,25 +13,6 @@ Driver | Type | Usage (add to your gradle dependencies) | Note
 [things-driver-pcf8591](pcf8591) | NXP I2C Analog to digital converter | `implementation 'nz.geek.android.things.driver:things-driver-pcf8591'` | [changelog](pcf8591/CHANGELOG.md)
 <!-- DRIVER_LIST_END -->
 
-## I2C Things
-
-
-PCF8591
-
-![Raspberry Pi Hookup](rpi3_pcf8591.png)
-
-## Display Things
-
-HD44870 type displays (via LCM1602)
-
-![Raspberry Pi Hookup](rpi3_lcd.png)
-
-## Colour sensor
-
-TCS34725 I2C Colour sensor
-
-![Raspberry Pi Hookup](rpi3_tcs34725.png)
-
 ## How to use
 
 1. Create an Android Things project as described [here](https://developer.android.com/things/training/first-device/create-studio-project.html)
