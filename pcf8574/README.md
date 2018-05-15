@@ -11,11 +11,11 @@ How to use the driver
 ### Gradle dependency
 
 To use the `pcf8574` driver, add the line below to your project's `build.gradle`,
-where `<version>` matches the last version of the driver available on [jcenter][jcenter].
+where `<version>` matches the last version of the driver available on [jcenter][latest].
 
 ```
 dependencies {
-    compile 'nz.geek.android.things.driver:things-driver-pcf8574:<version>'
+    implementation 'nz.geek.android.things:things-driver-pcf8574:<version>'
 }
 ```
 
@@ -72,5 +72,5 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
 
-[jcenter]: https://bintray.com/davemckelvie/maven/things-driver-pcf8574/_latestVersion
+[latest]: https://bintray.com/davemckelvie/maven/things-driver-pcf8574/_latestVersion
 

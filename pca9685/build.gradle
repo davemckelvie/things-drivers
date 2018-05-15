@@ -4,7 +4,7 @@ ext {
     bintrayRepo = 'maven'
     bintrayName = 'things-driver-pca9685'
 
-    publishedGroupId = 'nz.geek.android.things.driver'
+    publishedGroupId = 'nz.geek.android.things'
     libraryName = 'ThingsDriverPca9685'
     artifact = 'things-driver-pca9685'
 
@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/davemckelvie/things-drivers'
     gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
 
-    libraryVersion = '0.1'
+    libraryVersion = '0.2'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
