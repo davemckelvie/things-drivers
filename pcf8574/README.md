@@ -1,7 +1,7 @@
 PCF8574 IO driver for Android Things
 ====================================
 
-[ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-driver-pcf8574/images/download.svg) ][jcenter]
+[ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-driver-pcf8574/images/download.svg) ][latest]
 
 Android Things driver for the [PCF8574](https://www.nxp.com/documents/data_sheet/PCF8574.pdf) 8 bit I2C IO port
 
