@@ -1,5 +1,25 @@
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'things-driver-char-display'
+
+    publishedGroupId = 'nz.geek.android.things.driver'
+    libraryName = 'ThingsDriverCharDisplay'
+    artifact = 'things-driver-char-display'
+
+    libraryDescription = 'Character display driver for Android Things'
+
+    siteUrl = 'https://github.com/davemckelvie/things-drivers'
+    gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
+
+    libraryVersion = '0.1'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion COMPILE_SDK_VERSION
 
@@ -17,3 +37,6 @@ dependencies {
     compileOnly 'com.google.android.things:androidthings:1.0'
     implementation project(':pcf8574')
 }
+
+apply from: '../install.gradle'
+apply from: '../bintray.gradle'

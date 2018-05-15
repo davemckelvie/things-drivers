@@ -1,14 +1,14 @@
-# DaSiAnThiLib (Dave's Simple Android Things Library)
+Android Things drivers
+======================
 
 Here you will find some Android Things drivers.
 
 <!-- DRIVER_LIST_START -->
 Driver | Type | Usage (add to your gradle dependencies) | Note
 :---:|:---:| --- | ---
-[things-driver-char-display](display) | Character LCD and LED display diver | `implementation 'nz.geek.android.things.driver:things-driver-char-display'` | [changelog](display/CHANGELOG.md)
-[things-driver-pca9685](pca9685) | NXP 16 channel, 12 bit I2C PWM controller | `implementation 'nz.geek.android.things.driver:things-driver-pca9685'` | [changelog](pca9685/CHANGELOG.md)
-[things-driver-pcf8574](pcf8574) | NXP 8 bit I2C IO port | `implementation 'nz.geek.android.things.driver:things-driver-pcf8574:<version>'` |  [sample]() [changelog](pcf8574/CHANGELOG.md)
-[things-driver-pcf8591](pcf8591) | NXP I2C Analog to digital converter | `implementation 'nz.geek.android.things.driver:things-driver-pcf8591'` | [changelog](pcf8591/CHANGELOG.md)
+[things-driver-char-display](display) | Character LCD and LED display diver | `implementation 'nz.geek.android.things.driver:things-driver-char-display:<version>'` | [changelog](display/CHANGELOG.md)
+[things-driver-pca9685](pca9685) | NXP 16 channel, 12 bit I2C PWM controller | `implementation 'nz.geek.android.things.driver:things-driver-pca9685:version>'` | [changelog](pca9685/CHANGELOG.md)
+[things-driver-pcf8574](pcf8574) | NXP 8 bit I2C IO port | `implementation 'nz.geek.android.things.driver:things-driver-pcf8574:<version>'` |  [changelog](pcf8574/CHANGELOG.md)
 <!-- DRIVER_LIST_END -->
 
 ## License

@@ -1,5 +1,25 @@
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'things-driver-pca9685'
+
+    publishedGroupId = 'nz.geek.android.things.driver'
+    libraryName = 'ThingsDriverPca9685'
+    artifact = 'things-driver-pca9685'
+
+    libraryDescription = 'PCA9685 driver for Android Things'
+
+    siteUrl = 'https://github.com/davemckelvie/things-drivers'
+    gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
+
+    libraryVersion = '0.1'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion MIN_SDK_VERSION
 
@@ -18,3 +38,6 @@ dependencies {
 
     implementation 'com.android.support:appcompat-v7:27.1.1'
 }
+
+apply from: '../install.gradle'
+apply from: '../bintray.gradle'
