@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/davemckelvie/things-drivers'
     gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
 
-    libraryVersion = '0.2'
+    libraryVersion = '0.4'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
@@ -50,5 +50,4 @@ dependencies {
 
 }
 
-apply from: '../install.gradle'
-apply from: '../bintray.gradle'
+apply from: '../publish.gradle'
