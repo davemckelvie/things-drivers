@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="nz.geek.android.things.driver.pcf8591">
+
+    <application>
+        <uses-library android:name="com.google.android.things" />
+    </application>
+</manifest>

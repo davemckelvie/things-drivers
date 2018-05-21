@@ -1,0 +1,16 @@
+{
+  "title": "PCF8574",
+  "category": "IO Expansion",
+  "published-maven": {
+    "maven-url": "https://dl.bintray.com/davemckelvie/maven",
+    "groupid": "nz.geek.android.things",
+    "artifactid": "things-driver-pcf8574"
+  },
+  "compatible-with": [
+      {
+        "title": "Waveshare PCF8574 IO Expansion Board",
+        "photo": "https://www.waveshare.com/media/catalog/product/cache/1/thumbnail/122x122/9df78eab33525d08d6e5fb8d27136e95/p/c/pcf8574-io-expansion-board-2_1.jpg",
+        "url": "https://www.waveshare.com/pcf8574-io-expansion-board.htm"
+      }
+    ]
+  }

@@ -1,0 +1,95 @@
+
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        Production(MavenPublication) {
+            artifact "$buildDir/outputs/aar/$project.name-release.aar"
+            artifact sourceJar
+            artifact javadocJar
+            groupId publishedGroupId
+            artifactId artifact
+            version libraryVersion
+
+            pom.withXml {
+                final dependenciesNode = asNode().appendNode('dependencies')
+
+                ext.addDependency = { Dependency dep, String scope ->
+                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+                        return // ignore invalid dependencies
+
+                    final dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', dep.group)
+                    dependencyNode.appendNode('artifactId', dep.name)
+                    dependencyNode.appendNode('version', dep.version)
+                    dependencyNode.appendNode('scope', scope)
+
+                    if (!dep.transitive) {
+                        // If this dependency is transitive, we should force exclude all its dependencies them from the POM
+                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        exclusionNode.appendNode('groupId', '*')
+                        exclusionNode.appendNode('artifactId', '*')
+                    } else if (!dep.properties.excludeRules.empty) {
+                        // Otherwise add specified exclude rules
+                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        dep.properties.excludeRules.each { ExcludeRule rule ->
+                            exclusionNode.appendNode('groupId', rule.group ?: '*')
+                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                        }
+                    }
+                }
+
+                // List all "compile" dependencies (for old Gradle)
+                configurations.compile.getAllDependencies().each { dep -> addDependency(dep, "compile") }
+                // List all "api" dependencies (for new Gradle) as "compile" dependencies
+                configurations.api.getAllDependencies().each { dep -> addDependency(dep, "compile") }
+                // List all "implementation" dependencies (for new Gradle) as "runtime" dependencies
+                configurations.implementation.getAllDependencies().each { dep -> addDependency(dep, "runtime") }
+            }
+        }
+    }
+}
+
+// Bintray
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    publications = ['Production']
+
+    override = true
+
+    pkg {
+        repo = bintrayRepo
+        name = bintrayName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = allLicenses
+        publish = true
+        publicDownloadNumbers = true
+        version {
+            name = libraryVersion
+            released = new Date()
+        }
+    }
+}
+
