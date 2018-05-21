@@ -26,7 +26,7 @@ dependencies {
 ### Sample usage
 
 ```java
-import nz.geek.android.things.driver.pca9685.pca9685;
+import nz.geek.android.things.driver.pca9685.Pca9685;
 
 // Access PWM controller:
 Pca9685 pca9685;
