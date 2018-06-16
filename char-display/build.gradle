@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/davemckelvie/things-drivers'
     gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
 
-    libraryVersion = '0.5'
+    libraryVersion = '0.6'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
@@ -42,7 +42,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compileOnly 'com.google.android.things:androidthings:1.0'
-    implementation 'nz.geek.android.things:things-driver-pcf8574:0.4'
+    implementation 'nz.geek.android.things:things-driver-pcf8574:0.5'
 }
 
 apply from: '../publish.gradle'
