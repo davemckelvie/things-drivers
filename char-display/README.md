@@ -1,7 +1,7 @@
 Character display driver for Android Things
 ===========================================
 
-HD44870 type displays (via LCM1602)
+HD44870 type displays (via LCM1602). Check out a full explanation [here](https://www.hackster.io/davemckelvie/character-displays-with-android-things-6d44b1).
 
 ![Raspberry Pi Hookup](rpi3_lcd.png)
 
