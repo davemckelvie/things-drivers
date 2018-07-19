@@ -1,0 +1,16 @@
+{
+    "title": "PCA9685",
+    "category": "PWM controller",
+    "published-maven": {
+        "maven-url": "https://bintray.com",
+        "groupid": "nz.geek.android.things",
+        "artifactid": "things-driver-pca9685"
+    },
+    "compatible-with": [
+        {
+            "title": "Adafruit 16-channel 12-bit PWM/Servo Driver",
+            "url": "https://www.adafruit.com/product/815",
+            "photo": "https://cdn-shop.adafruit.com/970x728/815-04.jpg"
+        }
+    ]
+}
