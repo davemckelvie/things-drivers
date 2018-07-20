@@ -1,0 +1,16 @@
+{
+    "title": "HD44870 type displays",
+    "category": "character display",
+    "published-maven": {
+        "maven-url": "https://bintray.com",
+        "groupid": "nz.geek.android.things",
+        "artifactid": "things-driver-char-display"
+    },
+    "compatible-with": [
+        {
+            "title": "RGB backlight positive LCD 16x2",
+            "url": "https://www.adafruit.com/product/398",
+            "photo": "https://cdn-shop.adafruit.com/970x728/398-09.jpg"
+        }
+    ]
+}
