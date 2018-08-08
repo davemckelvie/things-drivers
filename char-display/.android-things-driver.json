@@ -2,7 +2,7 @@
     "title": "HD44870 type displays",
     "category": "character display",
     "published-maven": {
-        "maven-url": "https://bintray.com",
+        "maven-url": "https://dl.bintray.com/davemckelvie/maven",
         "groupid": "nz.geek.android.things",
         "artifactid": "things-driver-char-display"
     },
