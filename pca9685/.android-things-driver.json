@@ -2,7 +2,7 @@
     "title": "PCA9685",
     "category": "PWM controller",
     "published-maven": {
-        "maven-url": "https://bintray.com",
+        "maven-url": "https://dl.bintray.com/davemckelvie/maven",
         "groupid": "nz.geek.android.things",
         "artifactid": "things-driver-pca9685"
     },
