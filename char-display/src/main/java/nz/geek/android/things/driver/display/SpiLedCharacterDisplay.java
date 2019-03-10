@@ -58,7 +58,7 @@ public class SpiLedCharacterDisplay implements CharacterDisplay {
   }
 
   private byte[] toPacket(int line, String message) {
-    ByteBuffer bb = ByteBuffer.allocate(4 + message.length());
+    ByteBuffer bb = ByteBuffer.allocate(5 + message.length());
     bb.put(STX);
     bb.put(CMD_PRINT_LINE);
     bb.put((byte)(line & 0xFF));
