@@ -1,11 +1,38 @@
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'things-driver-pwm'
+
+    publishedGroupId = 'nz.geek.android.things'
+    libraryName = 'ThingsDriverPwm'
+    artifact = 'things-driver-pwm'
+
+    libraryDescription = 'PWM driver for Android Things'
+
+    siteUrl = 'https://github.com/davemckelvie/things-drivers'
+    gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
+
+    libraryVersion = '0.6'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion COMPILE_SDK_VERSION
 
     defaultConfig {
         minSdkVersion MIN_SDK_VERSION
         targetSdkVersion TARGET_SDK_VERSION
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
 }
 
@@ -17,3 +44,5 @@ dependencies {
     compileOnly 'com.google.android.things:androidthings:1.0'
     implementation 'nz.geek.android.things:things-driver-pca9685:0.4'
 }
+
+apply from: '../publish.gradle'

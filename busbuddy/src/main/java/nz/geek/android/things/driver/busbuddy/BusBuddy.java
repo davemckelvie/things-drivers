@@ -2,6 +2,7 @@ package nz.geek.android.things.driver.busbuddy;
 
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.google.android.things.pio.I2cDevice;
 import com.google.android.things.pio.PeripheralManager;
@@ -10,6 +11,11 @@ import java.io.IOException;
 import java.util.List;
 
 public class BusBuddy implements AutoCloseable {
+  private static final String TAG = BusBuddy.class.getSimpleName();
+
+  private static final String DEFAULT_BUS = "I2C1";
+
+  private final I2cDevice device;
 
   /* package */ BusBuddy(I2cDevice device) {
     this.device = device;
@@ -31,9 +37,29 @@ public class BusBuddy implements AutoCloseable {
     }
     return buffer[0];
   }
-  private static final String DEFAULT_BUS = "I2C1";
 
-  private final I2cDevice device;
+  public byte[] read(int length) {
+    if (device == null) return null;
+
+    byte[] buffer = new byte[length];
+    try {
+      device.read(buffer, length);
+    } catch (IOException e) {
+      //
+    }
+    return buffer;
+  }
+
+  public float readTemperature() {
+    int sp0 = readByte();
+    int sp1 = readByte();
+    //byte[] buffer = read(2);
+    Log.d(TAG, "readTemperature: " + sp0 + " " + sp1);
+    float temperature = sp0 >> 4;
+    temperature += sp1 << 4;
+    if ((sp0 & 0x80) == 0x80) temperature += 0.5;
+    return temperature;
+  }
 
   /**
    * Convenience method to get an I2C bus
