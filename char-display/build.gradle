@@ -1,25 +1,5 @@
 apply plugin: 'com.android.library'
 
-ext {
-    bintrayRepo = 'maven'
-    bintrayName = 'things-driver-char-display'
-
-    publishedGroupId = 'nz.geek.android.things'
-    libraryName = 'ThingsDriverCharDisplay'
-    artifact = 'things-driver-char-display'
-
-    libraryDescription = 'Character display driver for Android Things'
-
-    siteUrl = 'https://github.com/davemckelvie/things-drivers'
-    gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
-
-    libraryVersion = '0.7'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
-
 android {
     compileSdkVersion COMPILE_SDK_VERSION
 
@@ -38,11 +18,19 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     compileOnly 'com.google.android.things:androidthings:1.0'
-    implementation 'nz.geek.android.things:things-driver-pcf8574:0.5'
+    implementation 'nz.geek.android:things-driver-pcf8574:0.6'
 }
 
-apply from: '../publish.gradle'
+ext {
+    PUBLISH_GROUP_ID = 'nz.geek.android'
+    PUBLISH_ARTIFACT_ID = 'things-driver-char-display'
+    PUBLISH_VERSION = '0.8'
+    PUBLISH_DESC = 'Character display driver for Android Things'
+    PUBLISH_SITE_URL = 'https://github.com/davemckelvie/things-drivers'
+}
+
+apply from: "../publish-mavencentral.gradle"

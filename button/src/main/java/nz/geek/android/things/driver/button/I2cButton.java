@@ -15,7 +15,7 @@
  */
 package nz.geek.android.things.driver.button;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.ArrayMap;
 import android.util.Log;
 

@@ -16,7 +16,7 @@
 package nz.geek.android.things.driver.pca9685;
 
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.google.android.things.pio.I2cDevice;
 import com.google.android.things.pio.PeripheralManager;

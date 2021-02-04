@@ -1,6 +1,8 @@
 PCF8574 IO driver for Android Things
 ====================================
 
+![Maven Central](https://img.shields.io/maven-central/v/nz.geek.android/things-driver-pcf8574)
+
 [ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-driver-pcf8574/images/download.svg) ][latest]
 
 Android Things driver for the [PCF8574](https://www.nxp.com/documents/data_sheet/PCF8574.pdf) 8 bit I2C IO port
@@ -10,8 +12,7 @@ How to use the driver
 
 ### Gradle dependency
 
-To use the `pcf8574` driver, add the line below to your project's `build.gradle`,
-where `<version>` matches the last version of the driver available on [jcenter][latest].
+To use the `pcf8574` driver, add the line below to your project's `build.gradle`
 
 ```
 dependencies {
@@ -71,6 +72,4 @@ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
-
-[latest]: https://bintray.com/davemckelvie/maven/things-driver-pcf8574/_latestVersion
 

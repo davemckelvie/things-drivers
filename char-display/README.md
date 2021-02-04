@@ -1,6 +1,8 @@
 Character display driver for Android Things
 ===========================================
 
+![Maven Central](https://img.shields.io/maven-central/v/nz.geek.android/things-driver-char-display)
+
 HD44870 type displays (via LCM1602). Check out a full explanation [here](https://www.hackster.io/davemckelvie/character-displays-with-android-things-6d44b1).
 
 ![Raspberry Pi Hookup](rpi3_lcd.png)
@@ -8,7 +10,7 @@ HD44870 type displays (via LCM1602). Check out a full explanation [here](https:/
 ## Usage
 
 1. Create an Android Things project as described [here](https://developer.android.com/things/training/first-device/create-studio-project.html)
-2. Add the following to your project's `build.gradle` replace `version` with [latest version][latest]
+2. Add the following to your project's `build.gradle`
 ```
 dependencies {
     implementation 'nz.geek.android.things:things-driver-char-display:<version>'
@@ -68,6 +70,4 @@ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
-
-[latest]: https://bintray.com/davemckelvie/maven/things-driver-char-display/_latestVersion
 

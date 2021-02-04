@@ -7,14 +7,30 @@ android {
         minSdkVersion MIN_SDK_VERSION
         targetSdkVersion TARGET_SDK_VERSION
     }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     compileOnly 'com.google.android.things:androidthings:1.0'
-
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
 }
+
+ext {
+    PUBLISH_GROUP_ID = 'nz.geek.android'
+    PUBLISH_ARTIFACT_ID = 'things-driver-pcf8591'
+    PUBLISH_VERSION = '0.5'
+    PUBLISH_DESC = 'PCF8591 driver for Android Things'
+    PUBLISH_SITE_URL = 'https://github.com/davemckelvie/things-drivers'
+}
+
+apply from: "../publish-mavencentral.gradle"
