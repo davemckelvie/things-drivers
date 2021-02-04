@@ -3,8 +3,6 @@ PCA9685 16 channel, 12 bit, PWM controller
 
 ![Maven Central](https://img.shields.io/maven-central/v/nz.geek.android/things-driver-pca9685)
 
-[ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-driver-pca9685/images/download.svg) ][latest]
-
 Android Things driver for the [pca9685](https://www.nxp.com/docs/en/data-sheet/PCA9685.pdf) 16 channel, 12 bit PWM controller
 
 How to use the driver
