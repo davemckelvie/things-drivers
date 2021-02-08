@@ -1,8 +1,6 @@
 I2C button driver for Android Things
 ====================================
 
-[ ![Download](https://api.bintray.com/packages/davemckelvie/maven/things-driver-button/images/download.svg) ](https://bintray.com/davemckelvie/maven/things-driver-button/_latestVersion)
-
 Android Things driver for buttons connected via 8 bit I2C IO port
 
 How to use the driver
@@ -10,8 +8,7 @@ How to use the driver
 
 ### Gradle dependency
 
-To use the `button` driver, add the line below to your project's `build.gradle`,
-where `<version>` matches the last version of the driver available on [jcenter][jcenter].
+To use the `button` driver, add the line below to your project's `build.gradle`.
 
 ```
 dependencies {
@@ -50,5 +47,3 @@ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 License for the specific language governing permissions and limitations under
 the License.
-
-[jcenter]: https://bintray.com/davemckelvie/maven/things-driver-button/_latestVersion

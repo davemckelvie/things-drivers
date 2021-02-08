@@ -1,25 +1,5 @@
 apply plugin: 'com.android.library'
 
-ext {
-    bintrayRepo = 'maven'
-    bintrayName = 'things-driver-pca9685'
-
-    publishedGroupId = 'nz.geek.android.things'
-    libraryName = 'ThingsDriverPca9685'
-    artifact = 'things-driver-pca9685'
-
-    libraryDescription = 'PCA9685 driver for Android Things'
-
-    siteUrl = 'https://github.com/davemckelvie/things-drivers'
-    gitUrl = 'https://github.com/davemckelvie/things-drivers.git'
-
-    libraryVersion = '0.4'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
-
 android {
     compileSdkVersion COMPILE_SDK_VERSION
 
@@ -38,14 +18,19 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     compileOnly 'com.google.android.things:androidthings:1.0'
-
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
 }
 
-apply from: '../publish.gradle'
-//apply from: '../install.gradle'
-//apply from: '../bintray.gradle'
+ext {
+    PUBLISH_GROUP_ID = 'nz.geek.android'
+    PUBLISH_ARTIFACT_ID = 'things-driver-pca9685'
+    PUBLISH_VERSION = '0.5'
+    PUBLISH_DESC = 'PCA9685 driver for Android Things'
+    PUBLISH_SITE_URL = 'https://github.com/davemckelvie/things-drivers'
+}
+
+apply from: "../publish-mavencentral.gradle"
