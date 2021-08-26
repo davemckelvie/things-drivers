@@ -28,7 +28,7 @@ dependencies {
 ext {
     PUBLISH_GROUP_ID = 'nz.geek.android'
     PUBLISH_ARTIFACT_ID = 'things-driver-char-display'
-    PUBLISH_VERSION = '0.8'
+    PUBLISH_VERSION = '1.0.0'
     PUBLISH_DESC = 'Character display driver for Android Things'
     PUBLISH_SITE_URL = 'https://github.com/davemckelvie/things-drivers'
 }
