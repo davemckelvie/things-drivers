@@ -100,14 +100,6 @@ public interface CharacterDisplay {
   void setCustomCharacter(int address, byte[] pattern);
 
   /**
-   * Variant of {@link #setCustomCharacter(int, byte[])} that returns the address used
-   * to store the custom character
-   * @param pattern bit pattern of the custom character
-   * @return the address used
-   */
-  int setCustomCharacter(byte[] pattern);
-
-  /**
    * initialise custom characters for the display of bar graphs
    */
   void initBarGraph();

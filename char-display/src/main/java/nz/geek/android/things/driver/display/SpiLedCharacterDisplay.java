@@ -4,11 +4,9 @@ import java.nio.ByteBuffer;
 
 public class SpiLedCharacterDisplay implements CharacterDisplay {
 
-  private static final int MAX_CUSTOM_ADDRESS = 0x1F;
   private LedMatrixController device;
   private final int width;
   private final int height;
-  private int lastCustomAddressUsed = MAX_CUSTOM_ADDRESS;
 
   // ascii command characters
   private static final byte STX = 2; // start of text
@@ -121,15 +119,6 @@ public class SpiLedCharacterDisplay implements CharacterDisplay {
     bb.put(CUSTOM_CHAR_ADDRESS);
     bb.put(pattern);
     device.write(toPacket(bb.array()));
-  }
-
-  @Override
-  public int setCustomCharacter(byte[] pattern) {
-    if (lastCustomAddressUsed < 0) {
-      lastCustomAddressUsed = MAX_CUSTOM_ADDRESS;
-    }
-    setCustomCharacter(lastCustomAddressUsed, pattern);
-    return lastCustomAddressUsed--;
   }
 
   @Override

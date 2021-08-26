@@ -165,6 +165,11 @@ public abstract class AbstractLcdCharacterDisplay implements CharacterDisplay {
   @Override
   public void clearDisplay() {
     writeCommand(LCD_CLEAR_DISPLAY);
+    if (isDoubleDisplay()) {
+      switchDisplay(2);
+      writeCommand(LCD_CLEAR_DISPLAY);
+      switchDisplay(1);
+    }
   }
 
   private void setCgRamPattern(int address, byte[] pattern) {
@@ -182,12 +187,6 @@ public abstract class AbstractLcdCharacterDisplay implements CharacterDisplay {
       setCgRamPattern(address, pattern);
       switchDisplay(1);
     }
-  }
-
-  @Override
-  public int setCustomCharacter(byte[] pattern) {
-    // TODO: 12/09/17
-    return 0;
   }
 
   @Override
